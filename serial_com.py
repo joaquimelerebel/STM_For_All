@@ -1,71 +1,72 @@
-#!/bin/env python3 
+#!/bin/env python 
 
+from serial import Serial
 import serial as serialLib
+import subprocess
 
 class Serial_COM : 
-	def init(self):
+	def __init__(self):
 		#DEBUG verify the output of the shell command
-		subprocess = subprocess.Popen("ls /dev/tty.* | grep usb", shell=True, stdout=subprocess.PIPE)
-		subprocess_return = subprocess.stdout.read()
+		subp = subprocess.Popen("ls /dev/tty* | grep usb", shell=True, stdout=subprocess.PIPE)
+		subprocess_return = subp.stdout.read()
 
-		self.serial = serialLib.Serial(subprocess_return);
-
-		self.serial.baudrate = 115200;
+		self.serial = serialLib.Serial(subprocess_return, 115200);
 		
 		print("using : %s" % serial.name );
 
 	
-	def serial_init() :
+	def serial_init(self) :
 		self.serial.write("SE");
 
-	def serial_disable() :
+	def serial_disable(self) :
 		self.serial.write("SD");
 
 	# Scan size in LSBs
-	def scan_size( scan_size ) : 
+	def scan_size(self, scan_size ) : 
+		print( scan_size );
 		self.serial.write("SS" + scan_size );
 	
 	# Image pixels
-	def img_pixel( image_pix ) : 
+	def img_pixel( self, image_pix ) : 
 		self.serial.write("IP" + image_pix );
 	
 	# Line rate in Hz
-	def line_rate( freq ) : 
+	def line_rate( self, freq ) : 
 		self.serial.write("IP" + image_pix );
 
-	def x_offset( x_off ) : 
+	def x_offset( self, x_off ) : 
 		self.serial.write("XO" + x_off );
 
-	def y_offset( y_off ) : 
+	def y_offset( self, y_off ) : 
 		self.serial.write("YO" + y_off );
 	
 	# Setpoint in LSBs
-	def set_point( set_point ) : 
+	def set_point( self, set_point ) : 
 		self.serial.write("SP" + set_point );
 
 	#Sample bias in LSBs
-	def sample_bias( sample_bias ) : 
+	def sample_bias( self, sample_bias ) : 
 		self.serial.write("SB" + sample_bias );
 	
-	def PID_KPGain( kp ) : 
+	def PID_KPGain( self, kp ) : 
 		self.serial.write("KP" + kp );
 
-	def PID_KIGain( ki ) : 
+	def PID_KIGain( self, ki ) : 
 		self.serial.write("KI" + ki );
 	
-	def enable_scanning() :
+	def enable_scanning(self) :
 		self.serial.write("EN");
 
-	def disable_scanning() :
+	def disable_scanning(self) :
 		self.serial.write("DL");
 
-	def engage_tip() :
+	def engage_tip(self) :
 		self.serial.write("TE");
 
-	def retract_tip() :
+	def retract_tip(self) :
 		self.serial.write("TR");
 
-	def read_until_DATA() :
+	def read_until_DATA(self) :
 		stri = "";
 		while True : 
 			stri = str(self.serial.read(4));

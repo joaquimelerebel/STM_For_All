@@ -1,11 +1,12 @@
-#!/bin/env python3 
+#!/bin/env python
 
 import numpy as np
 from PIL import Image
 
 
 
-def createImage( array ) :
-	img = Image.fromarray(array);
-	#img.save('my.png');
+def createImage( array, save ) :
+	img = Image.fromarray( array );
+	if( save != "" ) : 
+		img.save( save );
 	img.show();
