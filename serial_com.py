@@ -3,14 +3,18 @@
 from serial import Serial
 import serial as serialLib
 import subprocess
+import cmd_int as cmd
 
 class Serial_COM : 
 	def __init__(self):
 		#DEBUG verify the output of the shell command
 		subp = subprocess.Popen("ls /dev/tty* | grep usb", shell=True, stdout=subprocess.PIPE)
-		subprocess_return = subp.stdout.read()
-
-		self.serial = serialLib.Serial(subprocess_return, 115200);
+		subprocess_return = subp.stdout.read();
+		try:
+			self.serial = serialLib.Serial(subprocess_return, 115200);
+		except Exception as e:
+			cmd.eprint_RED("software did not recognise the serial connection");
+			exit();
 		
 		print("using : %s" % serial.name );
 
