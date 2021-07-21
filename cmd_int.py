@@ -26,3 +26,8 @@ def print_GREEN(*args, **kwargs):
 	sys.stdout.write(u"\u001b[32m");
 	print(*args, **kwargs)
 	sys.stdout.write(u"\u001b[0m");
+
+#print in stdout in green
+def print_verbose_WHITE(config, *args, **kwargs):
+	if( config.verbose ) :
+		print(*args, **kwargs)
