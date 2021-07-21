@@ -29,12 +29,16 @@ def sim_image( image_filename, output_filename ) :
 
 	f.write( "[ " + str( width ) + ", " + str( height )  + " ]\n" );
 
+
+
 	for h in range(1, height): 
 			for w in range( 1, width ) :
+					#  convert point to 0-5V range
+					d = data[w, h][0]*0.01960784313;
 					if( w == width-1 ) :
-						f.write( str( data[w, h][0] ) + '\n' );
+						f.write( str( d ) + '\n' );
 					else :
-						f.write( str( data[w, h][0] ) + ", " );
+						f.write( str( d ) + ", " );
 
 	if( isinstance(output_filename, str) ) :
 		f.close()
