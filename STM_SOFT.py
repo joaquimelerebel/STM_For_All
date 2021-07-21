@@ -16,12 +16,14 @@ class Config :
 		self.gui = args.gui;
 		self.verbose = args.verbose;
 		self.filter = args.filter;
-		self.simulation = args.simulation;
-		
+		self.simulation = args.simulator;
+
 		if( args.save != "" ) :
 			self.save_file = args.save;
 		else :
-			self.save_file = "output.png";
+			self.save_file = "";
+		#else :
+			# self.save_file = "OutputFiles/output.png";
 		
 		if( args.kp != 0 ) :
 			self.kp = args.kp;
@@ -45,6 +47,11 @@ class Tests :
 		self.config = config;
 
 	def scan( self ) :
+		if( len( self.config.simulation ) > 0 ) :
+			simulation.sim_image( self.config.simulation, self.config.save_file );
+			exit();
+
+
 		serial = Serial_COM( self.config );
 		serial.init();
 		serial.kp( self.config.kp );
