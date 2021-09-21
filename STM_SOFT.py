@@ -1,4 +1,4 @@
-#!/bin/env python 
+#!/bin/env python3
 
 
 import argparse 
@@ -17,6 +17,12 @@ class Config :
 		self.verbose = args.verbose;
 		self.filter = args.filter;
 		self.simulation = args.simulator;
+		self.is_expodential = args.expodential;
+		self.normal_error = args.normal_error;
+		
+		self.error = args.error;
+		if args.error is None  : 
+			self.error = 0;
 
 		if( args.save != "" ) :
 			self.save_file = args.save;
@@ -48,7 +54,9 @@ class Tests :
 
 	def scan( self ) :
 		if( len( self.config.simulation ) > 0 ) :
-			simulation.sim_image( self.config.simulation, self.config.save_file );
+			simulation.sim_image( self.config.simulation, 
+				self.config.save_file, self.config.error, 
+				self.config.is_expodential, self.config.normal_error );
 			exit();
 
 
@@ -73,7 +81,11 @@ def main():
 	#command-line parser 
 	parser = argparse.ArgumentParser();
 
-	parser.add_argument("-sim", "--simulator", type=str, help="simulates the behaviour of the STM" );
+	parser.add_argument("-sim", "--simulator", type=str, help="simulates from the filename" );
+	parser.add_argument("-err", "--error", type=float, help="amount of sim maximum error" );
+	parser.add_argument("-err_norm", "--normal_error", action="store_true", help="the error is distributed normally" );
+	parser.add_argument("-exp", "--expodential", action="store_true", help="does scale the sim output expodentialy" );
+	
 
 	parser.add_argument("-s", "--size", type=int, help="size the edge of the final image", required=True );
 	parser.add_argument("-g", "--gui", help="graphical user interface result of the image", action="store_true");

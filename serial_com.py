@@ -1,6 +1,5 @@
-#!/bin/env python 
+#!/bin/env python3
 
-from serial import Serial
 import serial as serialLib
 import subprocess
 import cmd_int as cmd
