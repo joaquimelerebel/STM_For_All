@@ -1,6 +1,5 @@
 #!/bin/env python3
 
-
 import argparse 
 from serial_com import Serial_COM 
 import numpy as np
@@ -19,7 +18,9 @@ class Tests :
 			simulation.sim_image( self.config );
 			exit();
 
-
+		# will uncomment when the app will need something 
+		# else than a simulator
+		"""
 		serial = Serial_COM( self.config );
 		serial.init();
 		serial.kp( self.config.kp );
@@ -36,18 +37,18 @@ class Tests :
 				arr[i, j] = res;
 
 		createmap( arr, self.config );
-
+		"""
 def main():
 	#command-line parser 
 	parser = argparse.ArgumentParser();
 
-	parser.add_argument("-sim", "--simulator", type=str, metavar="filename", help="simulates from the filename" );
+	parser.add_argument("-sim", "--simulator", default="", type=str, metavar="filename", help="simulates from the filename" );
 	parser.add_argument("-err", "--error", default=0, type=float, metavar="ERROR", help="amount of sim maximum error or standard error depending on the error model (default : 0)" );
 	parser.add_argument("-err_norm", "--normal_error", action="store_true", help="the error is distributed normally" );
 	parser.add_argument("-exp", "--expodential", action="store_true", help="does scale the sim output expodentialy" );
 	
 
-	parser.add_argument("-s", "--size", type=int, help="size the edge of the final image", required=True );
+	parser.add_argument("-s", "--size", type=int, help="size of an edge of the square image");
 	parser.add_argument("-g", "--gui", help="graphical user interface result of the image", action="store_true");
 
 	parser.add_argument("-kp", type=int, help="PID KP constant (default 1)");
@@ -58,7 +59,7 @@ def main():
 	parser.add_argument("-v", "--verbose", action="store_true", help="print all the inner messages of the processing");
 	parser.add_argument("-f", "--filter", type=str, help="filter type applied on the final image");
 
-	parser.add_argument("-o", "--save", type=str, metavar="filename", help="output filename" );
+	parser.add_argument("-o", "--save", type=str, metavar="filename", help="output  filename" );
 	
 	#parser.add_argument("-d", "--dan", type=str, help="uses dan's microcontrolleur interface", action="store_true");
 
@@ -72,6 +73,6 @@ def main():
 
 
 
-if(__name__ == "__main__"  ) :
+if( __name__ == "__main__"  ) :
 	main()
 
