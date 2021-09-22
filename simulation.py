@@ -21,10 +21,13 @@ from numpy import asarray
 def sim_image( image_filename : str, 
 				output_filename : str, 
 				error : float, 
-				is_expodential_scale : bool) : 
+				is_expodential_scale : bool, 
+				is_normal_scale : bool ) : 
 	# error = float(error);
 	try : 
 		error = float(error);
+		if( is_normal_scale ) : 
+			assert 0 < error < 1;
 	except ValueError :
 		return;
 	else :
@@ -32,7 +35,7 @@ def sim_image( image_filename : str,
 		image = Image.open( image_filename ).convert('LA');
 		width, height = image.size;
 		px = image.load();
-		data = asarray(image)
+		data = asarray(image);
 
 	# print in the chosen file
 		if( isinstance(output_filename, str) ) :
@@ -44,6 +47,7 @@ def sim_image( image_filename : str,
 
 		# float error = error;
 
+
 		for h in range(1, height): 
 				for w in range( 1, width ) :
 						#  convert point to 0-5V range
@@ -52,7 +56,17 @@ def sim_image( image_filename : str,
 						else : 
 							d = data[w, h][0]*0.01960784313;
 						#randomisation
-						d = ( d + random.uniform(0-error/2, error/2) ) % 5;
+						if( is_expodential_scale ) :
+							d = ( d + random.normal( 0, error) );
+						else :
+							d = ( d + random.uniform(0-error/2, error/2) ) % 5;
+						
+						# applying filters
+						if  d > 5 : 
+							d = 5;
+						if d < 0 :
+							d = 0;
+						
 						if( w == width-1 ) :
 							f.write( str( d ) + '\n' );
 						else :

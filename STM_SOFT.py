@@ -18,12 +18,13 @@ class Config :
 		self.filter = args.filter;
 		self.simulation = args.simulator;
 		self.is_expodential = args.expodential;
-		self.normal_error = args.normal_error;
 		
-		self.error = args.error;
-		if args.error is None  : 
-			self.error = 0;
+		self.is_normal_error = args.normal_error;
+		if args.normal_error is None  : 
+			self.is_normal_error = 0;
 
+		self.error = args.error;
+	
 		if( args.save != "" ) :
 			self.save_file = args.save;
 		else :
@@ -56,7 +57,7 @@ class Tests :
 		if( len( self.config.simulation ) > 0 ) :
 			simulation.sim_image( self.config.simulation, 
 				self.config.save_file, self.config.error, 
-				self.config.is_expodential, self.config.normal_error );
+				self.config.is_expodential, self.config.is_normal_error );
 			exit();
 
 
@@ -82,7 +83,7 @@ def main():
 	parser = argparse.ArgumentParser();
 
 	parser.add_argument("-sim", "--simulator", type=str, help="simulates from the filename" );
-	parser.add_argument("-err", "--error", type=float, help="amount of sim maximum error" );
+	parser.add_argument("-err", "--error", type=float, help="amount of sim maximum error or standard error depending on the error model (default : 0)" );
 	parser.add_argument("-err_norm", "--normal_error", action="store_true", help="the error is distributed normally" );
 	parser.add_argument("-exp", "--expodential", action="store_true", help="does scale the sim output expodentialy" );
 	
@@ -95,7 +96,7 @@ def main():
 	parser.add_argument("-fr", "--frequence", type=int, help="line rate in Hz (default 100Hz)");
 	
 	
-	parser.add_argument("-v", "--verbose", help="print all the inner messages of the processing", action="store_true");
+	parser.add_argument("-v", "--verbose", action="store_true", help="print all the inner messages of the processing");
 	parser.add_argument("-f", "--filter", type=str, help="filter type applied on the final image");
 
 	parser.add_argument("--save", type=str, help="file name to which save the resulting image" );
