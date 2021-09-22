@@ -1,4 +1,5 @@
 import sys
+import config as conf
 
 from math import exp
 from PIL import Image
@@ -17,28 +18,23 @@ from numpy import random
 # .
 # x1yheight, x2yheight, ... xwidthyheight
 
-def sim_image( image_filename : str, 
-				output_filename : str, 
-				error : float, 
-				is_expodential_scale : bool, 
-				is_normal_scale : bool ) : 
-	# error = float(error);
+def sim_image( config : conf.Config ) : 
+	#check for wrong inputs
 	try : 
-		error = float(error);
-		if( is_normal_scale ) : 
-			assert 0 < error < 1;
+		if( config.is_normal_error ) : 
+			assert 0 < config.error < 1;
 	except ValueError :
 		return;
 	else :
 
-		image = Image.open( image_filename ).convert('LA');
+		image = Image.open( config.simulation_filename ).convert('LA');
 		width, height = image.size;
 		px = image.load();
-		data = asarray(image);
+		data = asarray( image );
 
 	# print in the chosen file
-		if( isinstance(output_filename, str) ) :
-			f = open(output_filename, "w")
+		if( isinstance( config.output_filename, str) ) :
+			f = open( config.output_filename, "w")
 		else :
 			f = sys.stdout;
 
@@ -50,15 +46,15 @@ def sim_image( image_filename : str,
 		for h in range(1, height): 
 				for w in range( 1, width ) :
 						#  convert point to 0-5V range
-						if( is_expodential_scale ) :
+						if( config.is_expodential_scale ) :
 							d =	(exp( data[w, h][0] ) *5)/ 5.5602316477276757e+110;
 						else : 
 							d = data[w, h][0]*0.01960784313;
 						#randomisation
-						if( is_normal_scale ) :
-							d = d + random.normal( 0, error);
+						if( config.is_normal_error ) :
+							d = d + random.normal( 0, config.error);
 						else :
-							d = ( d + random.uniform(0-error/2, error/2) ) % 5;
+							d = ( d + random.uniform(0-config.error/2, config.error/2) ) % 5;
 						
 						# applying filters
 						if  d > 5 : 
@@ -71,5 +67,5 @@ def sim_image( image_filename : str,
 						else :
 							f.write( str( d ) + ", " );
 
-		if( isinstance(output_filename, str) ) :
+		if( isinstance(config.output_filename, str) ) :
 			f.close()
