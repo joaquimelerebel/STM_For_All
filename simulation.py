@@ -1,10 +1,9 @@
 import sys
-import random 
 
 from math import exp
 from PIL import Image
 from numpy import asarray
-
+from numpy import random
 
 
 #get pixel value of each pixel of the picture
@@ -56,8 +55,8 @@ def sim_image( image_filename : str,
 						else : 
 							d = data[w, h][0]*0.01960784313;
 						#randomisation
-						if( is_expodential_scale ) :
-							d = ( d + random.normal( 0, error) );
+						if( is_normal_scale ) :
+							d = d + random.normal( 0, error);
 						else :
 							d = ( d + random.uniform(0-error/2, error/2) ) % 5;
 						
@@ -66,7 +65,7 @@ def sim_image( image_filename : str,
 							d = 5;
 						if d < 0 :
 							d = 0;
-						
+
 						if( w == width-1 ) :
 							f.write( str( d ) + '\n' );
 						else :
