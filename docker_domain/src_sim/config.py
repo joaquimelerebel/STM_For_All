@@ -4,7 +4,7 @@ class Config :
 		self.size = args.size;
 		self.gui = args.gui;
 		self.verbose = args.verbose;
-		self.filter = args.filter;
+		#self.filter = args.filter;
 		self.simulation_filename = args.simulation_filename;
 		self.is_expodential_scale = args.expodential;
 		
