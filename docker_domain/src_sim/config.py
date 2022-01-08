@@ -22,7 +22,7 @@ class Config :
 			self.output_filename = "";
 		#else :
 			# self.output_filename = "OutputFiles/output.png";
-		
+		"""
 		if( args.kp != 0 ) :
 			self.kp = args.kp;
 		else :
@@ -32,9 +32,10 @@ class Config :
 			self.ki = args.ki;
 		else :
 			self.ki = 1;
+		
 
 		if( args.frequence != 0 ) :
 			self.frequence = args.frequence;
 		else :
 			self.frequence = 100;
-		
+		"""

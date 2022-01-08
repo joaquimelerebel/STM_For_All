@@ -23,7 +23,7 @@ def sim_image( config : conf.Config ) :
 	#check for wrong inputs
 	try : 
 		if( config.is_normal_error ) : 
-			cmd.eprint_RED( "Not enough arguments" );
+			cmd.eprint_RED( "Not implemented yet" );
 			exit();
 	except ValueError :
 		return;
@@ -34,7 +34,7 @@ def sim_image( config : conf.Config ) :
 		px = image.load();
 		data = asarray( image );
 
-	# print in the chosen file
+	# print in the chosen file (stdout or a file)
 		if( isinstance( config.output_filename, str) ) :
 			f = open( config.output_filename, "w")
 		else :
@@ -42,17 +42,17 @@ def sim_image( config : conf.Config ) :
 
 		f.write( "[ " + str( width ) + ", " + str( height )  + " ]\n" );
 
-		# float error = error;
-
-
-		for h in range(1, height): 
-				for w in range( 1, width ) :
+		#create the map of 
+		for h in range( 0, height ): 
+				for w in range( 0, width ) :
+						
 						#  convert point to 0-5V range
 						if( config.is_expodential_scale ) :
 							d =	(exp( data[w, h][0] ) *5)/ 5.5602316477276757e+110;
 						else : 
 							d = data[w, h][0]*0.01960784313;
-						#randomisation
+						
+						#error generation
 						if( config.is_normal_error ) :
 							d = d + random.normal( 0, config.error );
 						else :
