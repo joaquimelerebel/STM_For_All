@@ -21,7 +21,7 @@ def main():
 
 	parser.add_argument( 
 		default="", dest="simulation_filename", 
-		type=argparse.FileType('r'), 
+		type=str, 
 		metavar="SIM_FILENAME", 
 		help="simulates from this file" );
 
@@ -42,13 +42,8 @@ def main():
 	parser.add_argument("-g", "--gui", 
 		help="graphical user interface result of the image", action="store_true");
 
-	parser.add_argument("-kp", type=int, help="PID KP constant (default 1)");
-	parser.add_argument("-ki", type=int, help="PID KI constant (default 1)");
-	parser.add_argument("-fr", "--frequence", type=int, help="line rate in Hz (default 100Hz)");
-	
 	
 	parser.add_argument("-v", "--verbose", action="store_true", help="print all the inner messages of the processing");
-	parser.add_argument("-f", "--filter", type=str, help="filter type applied on the final image");
 
 	parser.add_argument("-o", "--save", 
 		type=str, 

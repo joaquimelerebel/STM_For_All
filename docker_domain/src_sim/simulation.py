@@ -1,5 +1,6 @@
 import sys
 import config as conf
+import cmd_int as cmd
 
 from math import exp
 from PIL import Image
@@ -22,7 +23,8 @@ def sim_image( config : conf.Config ) :
 	#check for wrong inputs
 	try : 
 		if( config.is_normal_error ) : 
-			assert 0 < config.error < 1;
+			cmd.eprint_RED( "Not enough arguments" );
+			exit();
 	except ValueError :
 		return;
 	else :
@@ -52,9 +54,9 @@ def sim_image( config : conf.Config ) :
 							d = data[w, h][0]*0.01960784313;
 						#randomisation
 						if( config.is_normal_error ) :
-							d = d + random.normal( 0, config.error);
+							d = d + random.normal( 0, config.error );
 						else :
-							d = ( d + random.uniform(0-config.error/2, config.error/2) ) % 5;
+							d = ( d + random.uniform( 0-config.error/2, config.error/2 ) ) % 5;
 						
 						# applying filters
 						if  d > 5 : 
