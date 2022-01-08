@@ -22,9 +22,7 @@ from numpy import random
 def sim_image( config : conf.Config ) : 
 	#check for wrong inputs
 	try : 
-		if( config.is_normal_error ) : 
-			cmd.eprint_RED( "Not implemented yet" );
-			exit();
+		pass
 	except ValueError :
 		return;
 	else :

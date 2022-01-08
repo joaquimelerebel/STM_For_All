@@ -31,7 +31,7 @@ def main():
 		help="amount of sim maximum error or standard error depending on the error model (default : 0)" );
 	parser.add_argument("-err_norm", "--normal_error", 
 		action="store_true", 
-		help="the error is distributed normally" );
+		help="the error is distributed normally (err is the mean of the distribution)" );
 	parser.add_argument("-exp", "--expodential", 
 		action="store_true", 
 		help="does scale the sim output expodentialy" );
