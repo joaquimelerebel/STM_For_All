@@ -17,8 +17,7 @@ class Config :
             self.is_uniform_error = True;
 
         self.error = args.error;
-        if args.error is None  : 
-            self.error = 0;
+        self.error_mean  = args.error_mean
 
         if( args.save != "" ) :
             self.output_filename = args.save;

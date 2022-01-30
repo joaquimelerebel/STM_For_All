@@ -56,17 +56,17 @@ def sim_image( config : conf.Config ) :
 
                 #error generation
                 if( config.is_normal_error ) :
-                    data_with_error = data[w, h] + random.normal( 0, config.error );
+                    data[w, h] = data[w, h] + random.normal( config.error_mean, config.error );
                 elif( config.is_uniform_error ) :
-                    data_with_error = data[w, h] + random.uniform( 0-(config.error/2), config.error/2 );
+                    data[w, h]  = data[w, h] + random.uniform( 0-(config.error/2), config.error/2 ) + config.error_mean;
                 else : 
-                    data_with_error = data[w, h];
+                    data[w, h]  = data[w, h];
 
                 #  convert point to 0-5V range
                 if( config.is_expodential_scale ) :
-                    data_voltage =	(exp( data_with_error ) *5)/ 5.5602316477276757e+110;
+                    data_voltage =	(exp(  data[w, h]  ) *5)/ 5.5602316477276757e+110;
                 else : 
-                    data_voltage = (data_with_error*5)/255;
+                    data_voltage = (data[w, h]*5)/255;
 
 
                 # applying filters
