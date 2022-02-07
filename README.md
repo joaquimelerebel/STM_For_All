@@ -20,6 +20,22 @@ help :
 to do the firsts tests : 
 `python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5`
 
+## to show an image
+
+Got to `src_show`
+
+To generate a matrix from a picture, use:
+
+```
+python3 ../src_sim/SIM_STM.py ../Test_Picture/ContactCopper.jpg -o output
+```
+
+To convert the matrix to an image:
+
+```
+python3 display.py output
+```
+
 ## requierments 
 autofilled by the requirements.txt normally
 
