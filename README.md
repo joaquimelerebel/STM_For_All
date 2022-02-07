@@ -44,15 +44,13 @@ To convert the matrix to an image:
 python3 display.py output
 ```
 
-## Requierments
+## Requirements
 
 Autofilled by the requirements.txt normally
 
 More complexe test with expodential error (in this case print the contact copper with a normal error stdev of 0.5, mean of 0.12, expodential scaling at the output and statistics available of the different transformations) :
 `python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5 -errtype normal -stat -errM 0.12 -exp`
 
-## Requierments 
-autofilled by the requirements.txt normally
 
 ## What is currently not working
 
