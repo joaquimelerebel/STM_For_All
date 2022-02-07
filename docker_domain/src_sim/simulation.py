@@ -46,10 +46,14 @@ class FileWriter:
     def writeAll(self, arr):
         if(self.isCaching == True):
             if(self.isBin == True):
-                save(self.config.output_filename, arr)
-                # with open( os.open(config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "wb" ) as f :
-                #    array.astype("float64").tofile( config.output_filename );
-            else:
+                if( self.isNumpyBin == True ):
+                    save(self.config.output_filename, arr)
+                else :  
+                    with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "wb") as f:
+                        f.write(self.width, self.height)
+                        for w, h in zip( arr.size ) :
+                            pass
+            else :
                 with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "w") as f:
                     f.write(self.cache)
 
