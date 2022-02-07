@@ -1,31 +1,30 @@
-# setting up the default config
-class Config:
-    def __init__(self, args):
-        self.size = args.size
-        self.gui = args.gui
-        self.verbose = args.verbose
+#setting up the default config
+class Config : 
+    def __init__(self, args) :
+        self.size = args.size;
         #self.filter = args.filter;
-        self.simulation_filename = args.simulation_filename
-        self.is_exponential_scale = args.exponential
-        self.is_statistical = args.statisics
+        self.simulation_filename = args.simulation_filename;
+        self.is_exponential_scale = args.exponential;
+        self.is_statistical = args.statisics;
+        self.is_bin = args.bin;
 
-        if(args.error_type == "normal"):
-            self.is_normal_error = True
-            self.is_uniform_error = False
-        elif(args.error_type == "uniform"):
-            self.is_normal_error = False
-            self.is_uniform_error = True
+        if( args.error_type == "normal") : 
+            self.is_normal_error = True;
+            self.is_uniform_error = False;
+        elif( args.error_type == "uniform") : 
+            self.is_normal_error = False;
+            self.is_uniform_error = True;
 
-        self.error = args.error
-        if args.error is None:
-            self.error = 0
+        self.error = args.error;
+        self.error_mean  = args.error_mean
 
-        if(args.save != ""):
-            self.output_filename = args.save
-        else:
-            self.output_filename = ""
+        if( args.save != "" ) :
+            self.output_filename = args.save;
+        else :
+            self.output_filename = "";
 
-        # else :
+
+        #else :
             # self.output_filename = "OutputFiles/output.png";
         """
         if( args.kp != 0 ) :
