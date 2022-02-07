@@ -6,7 +6,7 @@ class Config :
         self.simulation_filename = args.simulation_filename;
         self.is_expodential_scale = args.expodential;
         self.is_statistical = args.statisics;
-        self.is_binary_inputs = args.bin;
+        self.is_bin = args.bin;
 
         if( args.error_type == "normal") : 
             self.is_normal_error = True;
