@@ -17,17 +17,20 @@ def main(filename):
     # collecting the size of the array
     fileline = f.readline()
     size = re.sub(r"[\[-\]]", "", fileline).replace(" ", "").split(",")
-    width, height = np.asarray(size, int)-[5, 5]
-    # creating our array to have our image
-    data = np.zeros((width, height, 3), dtype=np.float64)
 
-    for w in range(0, width):
+    # preventing /n by retrieving 2 values from the width
+    height, width = np.asarray(size, int)-[0, 2]
+
+    # creating our array to have our image
+    data = np.zeros((height, width, 3), dtype=np.float64)
+
+    for h in range(0, height):
         line = f.readline()
         value = np.asarray(line.replace(
             " ", "").split(","), np.float64)[0:width]*255/5
-        data[w] = np.array([value, value, value]).transpose()
+        data[h] = np.array([value, value, value]).transpose()
 
-    img = Image.fromarray(data, 'RGB').convert("L")
+    img = Image.fromarray(data, 'RGB')
     img.save('result.png')
     img.show('result.png')
 
