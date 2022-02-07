@@ -1,0 +1,28 @@
+/* 
+// Colors
+main: "#1C1C1C",
+light: "#242429",
+dark: "#131313",
+contrastText: "#ffffff",
+textFont: "Montserrat",
+
+// Breakpoints
+xs: 0,
+sm: 600,
+md: 900,
+lg: 1200,
+xl: 1536, */
+
+body {
+    background-color: #ffffff
+}
+
+.title {
+    color: #131313;
+    font-size: 48px;
+    margin-left: 2%
+}
+
+.input {
+    color: #131313;
+}
