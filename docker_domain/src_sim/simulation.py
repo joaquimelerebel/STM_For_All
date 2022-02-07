@@ -1,4 +1,5 @@
 import sys
+import os
 import config as conf
 import cmd_int as cmd
 
@@ -32,7 +33,7 @@ def sim_image( config : conf.Config ) :
 
     # print in the chosen file (stdout or a file)
         if( isinstance( config.output_filename, str) ) :
-            f = open( config.output_filename, "w")
+            f = open( os.open(config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), 'w' );
         else :
             f = sys.stdout;
 
