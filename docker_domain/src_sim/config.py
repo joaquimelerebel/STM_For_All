@@ -2,12 +2,11 @@
 class Config : 
     def __init__(self, args) :
         self.size = args.size;
-        self.gui = args.gui;
-        self.verbose = args.verbose;
         #self.filter = args.filter;
         self.simulation_filename = args.simulation_filename;
         self.is_expodential_scale = args.expodential;
         self.is_statistical = args.statisics;
+        self.is_bin = args.bin;
 
         if( args.error_type == "normal") : 
             self.is_normal_error = True;
@@ -17,8 +16,7 @@ class Config :
             self.is_uniform_error = True;
 
         self.error = args.error;
-        if args.error is None  : 
-            self.error = 0;
+        self.error_mean  = args.error_mean
 
         if( args.save != "" ) :
             self.output_filename = args.save;

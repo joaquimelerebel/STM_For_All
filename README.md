@@ -20,6 +20,8 @@ help :
 to do the firsts tests : 
 `python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5`
 
+more complexe test with expodential error (in this case print the contact copper with a normal error stdev of 0.5, mean of 0.12, expodential scaling at the output and statistics available of the different transformations) :
+`python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5 -errtype normal -stat -errM 0.12 -exp`
 ## requierments 
 autofilled by the requirements.txt normally
 
