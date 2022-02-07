@@ -28,7 +28,7 @@ Help:
 
 `python3 SIM_STM.py -h`
 
-## to show an image
+## To show an image
 
 Got to `src_show`
 
