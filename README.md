@@ -4,7 +4,7 @@
   - [How to install](#how-to-install)
   - [To run the simulator](#to-run-the-simulator)
   - [To show an image](#to-show-an-image)
-  - [Requierments](#requierments)
+  - [Requirements](#requirements)
   - [What is currently not working](#what-is-currently-not-working)
   
 ## How to install
@@ -30,7 +30,7 @@ Help:
 
 ## To show an image
 
-Got to `src_show`
+Go to `src_show`.
 
 To generate a matrix from a picture, use:
 
@@ -38,10 +38,14 @@ To generate a matrix from a picture, use:
 python3 ../src_sim/SIM_STM.py ../Test_Picture/ContactCopper.jpg -o output
 ```
 
-To convert the matrix to an image:
+To convert the matrix to an image, we have three parameters:
+
+* `filename` which is the name of the file we want to read
+* `-f` for files and `-bin` for binary
+* `outputFile.jpg` to specify which output file
 
 ```
-python3 display.py output
+python3 display.py output -f myFile.jpg
 ```
 
 ## Requirements
@@ -50,7 +54,6 @@ Autofilled by the requirements.txt normally
 
 More complexe test with expodential error (in this case print the contact copper with a normal error stdev of 0.5, mean of 0.12, expodential scaling at the output and statistics available of the different transformations) :
 `python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5 -errtype normal -stat -errM 0.12 -exp`
-
 
 ## What is currently not working
 
