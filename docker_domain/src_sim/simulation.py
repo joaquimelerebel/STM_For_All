@@ -67,7 +67,6 @@ class FileWriter:
 # .
 # x1yheight, x2yheight, ... xwidthyheight
 
-
 def sim_image(config: conf.Config):
     image = Image.open(config.simulation_filename).convert('L')
     width, height = image.size
@@ -115,9 +114,9 @@ def sim_image(config: conf.Config):
                 data[h, w] = data[h, w]
             # breakpoint();
             #  convert point to 0-5V range
-            if(config.is_expodential_scale):
+            if(config.is_exponential_scale):
                 data_voltage = (exp(data[h, w]) * 5) / 5.5602316477276757e+110
-            # elif( config.is_complexe_expodential_scale ) :
+            # elif( config.is_complexe_exponential_scale ) :
             #    pass;
                 # J_T prop exp(-A\Phi^{1/2}s)
                 # A=sqrt((4*\pi/h)*2m)=1.025 Ang^-1 eV^-(1/2)

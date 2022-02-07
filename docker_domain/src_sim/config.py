@@ -4,7 +4,7 @@ class Config :
         self.size = args.size;
         #self.filter = args.filter;
         self.simulation_filename = args.simulation_filename;
-        self.is_expodential_scale = args.expodential;
+        self.is_exponential_scale = args.exponential;
         self.is_statistical = args.statisics;
         self.is_bin = args.bin;
 
