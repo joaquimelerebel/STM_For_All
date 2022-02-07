@@ -48,7 +48,7 @@ def sim_image(config: conf.Config):
                 if(config.is_exponential_scale):
                     d = (exp(data[w, h][0]) * 5) / 5.5602316477276757e+110
                 else:
-                    d = data[w, h][0]*0.01960784313
+                    d = data[w, h][0]*(5/255)
                 # randomisation
                 if(config.is_normal_error):
                     d = d + random.normal(0, config.error)
