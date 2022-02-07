@@ -65,6 +65,17 @@ def sim_image( config : conf.Config ) :
                 #  convert point to 0-5V range
                 if( config.is_expodential_scale ) :
                     data_voltage =	(exp(  data[w, h]  ) *5)/ 5.5602316477276757e+110;
+                #elif( config.is_complexe_expodential_scale ) :
+                #    pass;
+                    # J_T prop exp(-A\Phi^{1/2}s)
+                    # A=sqrt((4*\pi/h)*2m)=1.025 Ang^-1 eV^-(1/2)
+                    # m = mass of the free electron
+                    # cf surface studies by scanning tunneling mircroscopy 1982 G. Binning, H. Rohrer
+                    # trying to convert with realistic values
+
+                    # if constant tunneling current :
+                    # \Phi^(1/2)s=const
+                    # Pz is the index of the displacement : potential at the piezo borders 
                 else : 
                     data_voltage = (data[w, h]*5)/255;
 

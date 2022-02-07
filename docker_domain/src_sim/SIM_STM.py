@@ -25,6 +25,12 @@ def main():
             metavar="SIM_FILENAME", 
             help="simulates from this file" );
     
+    parser.add_argument( "-bin", "--is_binary_output",
+            dest="bin",
+            default=False, 
+            action="store_true",
+            help="outputs the in a binary file" );
+    
     parser.add_argument("-errM", "--error_mean", 
             default=0, type=float, 
             metavar="ERROR_MEAN", 
@@ -45,7 +51,8 @@ def main():
             \"uniform\" (ERROR is the maximum error, default) Be careful, the error is applied before the uniform or expodential transformation to voltage""" );
 
     parser.add_argument("-exp", "--expodential", 
-            action="store_true", 
+            action="store_true",
+            default=False,
             help="scale the sim output expodentialy" );
 
     parser.add_argument("-stat", "--statisics", 
@@ -54,11 +61,6 @@ def main():
 
     parser.add_argument("-s", "--size", 
             type=int, help="size of an edge of the square image");
-    parser.add_argument("-g", "--gui", 
-            help="graphical user interface result of the image", action="store_true");
-    parser.add_argument("-v", "--verbose", 
-            action="store_true", 
-            help="print all the inner messages of the processing");
 
     parser.add_argument("-o", "--save", 
             type=str, 
@@ -70,7 +72,6 @@ def main():
 
     config = conf.Config( args );
     simulation.sim_image( config );
-
 
 
 
