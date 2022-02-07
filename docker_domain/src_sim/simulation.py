@@ -46,13 +46,14 @@ class FileWriter :
 
 
     def writeAll(self, arr) :
-        if( self.isBin == True ) : 
-            save(self.config.output_filename, arr);
-            #with open( os.open(config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "wb" ) as f : 
-            #    array.astype("float64").tofile( config.output_filename );
-        else :
-            with open( os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "w" ) as f :
-                f.write(self.cache);
+        if( self.isCaching == True ) :
+            if( self.isBin == True ) : 
+                save(self.config.output_filename, arr);
+                #with open( os.open(config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "wb" ) as f : 
+                #    array.astype("float64").tofile( config.output_filename );
+            else :
+                with open( os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "w" ) as f :
+                    f.write(self.cache);
 
 #get pixel value of each pixel of the picture
 # each point is a float64
@@ -104,15 +105,15 @@ def sim_image( config : conf.Config ) :
 
             #error generation
             if( config.is_normal_error ) :
-                data[w, h] = data[w, h] + random.normal( config.error_mean, config.error );
+                data[h, w] = data[h, w] + random.normal( config.error_mean, config.error );
             elif( config.is_uniform_error ) :
-                data[w, h]  = data[w, h] + random.uniform( 0-(config.error/2), config.error/2 ) + config.error_mean;
+                data[h, w]  = data[h, w] + random.uniform( 0-(config.error/2), config.error/2 ) + config.error_mean;
             else : 
-                data[w, h]  = data[w, h];
-
+                data[h, w]  = data[h, w];
+            #breakpoint();
             #  convert point to 0-5V range
             if( config.is_expodential_scale ) :
-                data_voltage =	(exp(  data[w, h]  ) *5)/ 5.5602316477276757e+110;
+                data_voltage =	(exp(  data[h, w]  ) *5)/ 5.5602316477276757e+110;
             #elif( config.is_complexe_expodential_scale ) :
             #    pass;
                 # J_T prop exp(-A\Phi^{1/2}s)
@@ -125,7 +126,7 @@ def sim_image( config : conf.Config ) :
                 # \Phi^(1/2)s=const
                 # Pz is the index of the displacement : potential at the piezo borders 
             else : 
-                data_voltage = (data[w, h]*5)/255;
+                data_voltage = (data[h, w]*5)/255;
 
 
             # applying filters
@@ -134,7 +135,7 @@ def sim_image( config : conf.Config ) :
             if data_voltage < 0 :
                 data_voltage = 0;
 
-            data_voltages[w, h] = data_voltage;
+            data_voltages[h, w] = data_voltage;
 
             # printing result
             #if( w == width-1 ) :
