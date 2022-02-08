@@ -25,11 +25,11 @@ def main():
             metavar="SIM_FILENAME", 
             help="simulates from this file" );
     
-    parser.add_argument( "-bin", "--is_binary_output",
-            dest="bin",
-            default=False, 
-            action="store_true",
-            help="outputs the in a binary file" );
+    parser.add_argument( "-ot", "--output_type",
+            dest="output_type", type=str,
+            default="ASCII", 
+            choices=["ASCII", "BIN_NP", "BIN_MST"],
+            help="outputs type for the file format (ASCII, BIN_NP, BIN_MST)" );
     
     parser.add_argument("-errM", "--error_mean", 
             default=0, type=float, 
