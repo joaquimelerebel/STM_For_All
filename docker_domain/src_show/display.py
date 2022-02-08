@@ -1,5 +1,6 @@
 import sys
 import re
+import struct 
 
 from numpy import asarray, zeros, float64, array, load
 from PIL import Image
@@ -7,7 +8,7 @@ from PIL import Image
 
 def main(filename, binary, output):
 
-    if (binary == "-bin"):
+    if (binary == "-binNP"):
         file = load(filename)
         height, width = file.shape 
         
@@ -20,7 +21,41 @@ def main(filename, binary, output):
         img = Image.fromarray(data, 'RGB')
         img.save(output)
         img.show(output)
+
+    if (binary == "-bin") :
+        try :
+            with open(filename, "rb") as f :
+                filecontent = f.read();
+        except IOError as err :
+            sys.stderr.write( f"file does not exists : {err=}" );
+            return 0;
+
+        try : 
+            if( len(filecontent) < 32 ) : 
+                raise IOError("file is too short");
+            b_header = filecontent[0:32];
+            mst = b_header[0:3].decode("ascii");
+            if(mst != "MST") :
+                raise IOError("not a MST file type")
+            version = struct.unpack(">h", b_header[3:5]);
+            patch = struct.unpack(">h", b_header[5:7]);
+            point_length = struct.unpack(">B", b_header[7:8]);
+            height = struct.unpack(">i", b_header[8:12]);
+            width = struct.unpack(">i", b_header[12:16]);
+            metadata = b_header[16:32]
             
+            supposed_len = width*height*((2**point_length)/8)
+            if(len(filecontent[32:]) != supposed_len) :
+                raise IOError("file not the supposed length");
+
+        except IOError as err :
+            sys.stderr.write( f"file does not corresponds to the format : {err=}" );
+            return 0;
+
+        except ValueError as err :
+            sys.stderr.write( f"could not convert data to right format : {err=}" );
+            return 0;
+
     elif (binary =="-f"):
         # try opening output_filename, if there is none, let's do it in stdout
         if(isinstance(filename, str)):
