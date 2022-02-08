@@ -3,7 +3,7 @@ import os
 import struct
 from math import exp, log
 from PIL import Image
-from numpy import asarray, random, std, zeros, save
+from numpy import asarray, random, std, zeros, save, uint8
 
 import config as conf
 VERSION=0
@@ -167,21 +167,18 @@ def sim_image(config: conf.Config):
                 data_voltage = 0
 
             data_voltages[h, w] = data_voltage
-
+        
             # printing result
-            # if( w == width-1 ) :
-            #    f.write( str( data_voltage ) + '\n' );
-            # else :
-            #    f.write( str( data_voltage ) + ", " );
             if(w == width-1):
                 fw.writePoint(data_voltage, True)
             else:
                 fw.writePoint(data_voltage, False)
 
-
-    # if( isinstance(config.output_filename, str) ) :
-    #    f.close()
     fw.writeAll(data_voltages)
+    
+    #verification
+    #im = Image.fromarray(uint8(data_voltages*255/5));
+    #im.save("imgoutput.png");
 
     if(config.is_statistical):
 

@@ -2,7 +2,7 @@ import sys
 import re
 import struct
 
-from numpy import asarray, zeros, float64, array, load
+from numpy import asarray, zeros, float64, array, load, uint8
 from PIL import Image
 
 
@@ -63,15 +63,17 @@ def main(filename, binary, output):
         if (binary == "-bin"):
             file, height, width = readMSTfile(filename)
 
+        im = Image.fromarray(uint8(file*255/5));
+        im.save("imgoutput.png");
+
+
         # creating our array to have our image
-        data = zeros((height, width, 3), dtype=float64)
-        value = file*255/5
-        data = array([value, value, value]).transpose()
+        value = uint8(file*255/5)
 
         # image
-        img = Image.fromarray(data, 'RGB')
+        img = Image.fromarray(value, 'L')
         img.save(output)
-        img.show(output)
+        #img.show(output)
 
     elif (binary == "-f"):
         # try opening output_filename, if there is none, let's do it in stdout
