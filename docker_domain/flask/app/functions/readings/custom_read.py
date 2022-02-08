@@ -3,7 +3,7 @@ import struct
 from flask import flash
 from numpy import zeros, float64, array
 
-from save_image import save_image
+from functions.readings.save_image_linear import save_image
 
 
 def custom_read(file, input_folder, output_folder):
@@ -43,11 +43,8 @@ def custom_read(file, input_folder, output_folder):
                  int(i/point_byte_len) % width] = point
 
         # creating our array to have our image
-        output = zeros([height, width, 3], dtype=float64)
-        value = data*255/5
-        output = array([value, value, value]).transpose()
 
-        return save_image(file, output, output_folder)
+        return save_image(file, data, output_folder)
     except IOError as err:
         sys.stderr.write(f"file does not corresponds to the format : {err=}")
         flash('File does not corresponds to the format :', err)
