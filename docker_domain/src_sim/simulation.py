@@ -135,18 +135,16 @@ def sim_image(config: conf.Config):
         for w in range(0, width):
 
             # error generation
-            if(config.is_normal_error):
-                dataSet[h, w] = data[h, w] + \
-                    random.normal(config.error_mean, config.error)
-            elif(config.is_uniform_error):
-                dataSet[h, w] = data[h, w] + random.uniform(0-(config.error/2),
-                                                            config.error/2) + config.error_mean
-            else:
+            if (config.is_normal_error) :
+                dataSet[h, w] = data[h, w] + random.normal(config.error_mean, config.error)
+            elif(config.is_uniform_error) :
+                dataSet[h, w] = data[h, w] + random.uniform(0-(config.error/2), config.error/2) + config.error_mean
+            else :
                 dataSet[h, w] = data[h, w]
-            # breakpoint();
+
             #  convert point to 0-5V range
             if(config.is_exponential_scale):
-                data_voltage = (exp(data[h, w]) * 5) / 5.5602316477276757e+110
+                data_voltage = (exp(dataSet[h, w]) * 5) / 5.5602316477276757e+110
             # elif( config.is_complexe_exponential_scale ) :
             #    pass;
                 # J_T prop exp(-A\Phi^{1/2}s)
@@ -159,7 +157,7 @@ def sim_image(config: conf.Config):
                 # \Phi^(1/2)s=const
                 # Pz is the index of the displacement : potential at the piezo borders
             else:
-                data_voltage = (data[h, w]*5)/255
+                data_voltage = (dataSet[h, w]*5)/255
 
             # applying filters
             if data_voltage > 5:
@@ -184,7 +182,7 @@ def sim_image(config: conf.Config):
     if(config.is_statistical):
 
         # creation of the image with error statistics
-        dataflatten = data.flatten()
+        dataflatten = dataSet.flatten()
         maxWith_error = max(dataflatten)
         minWith_error = min(dataflatten)
         meanWith_error = sum(dataflatten)/len(dataflatten)
@@ -202,10 +200,3 @@ def sim_image(config: conf.Config):
             "max": maxVolt, "min": minVolt, "mean": meanVolt, "stdev": stdevVolt}
 
         print(statistics_set)
-
-        # output of the statistics
-        print("-- image --")
-        print("max : " + str(maxImage))
-        print("min : " + str(minImage))
-        print("mean : " + str(meanImage))
-        print("st dev : " + str(stdevImage))
