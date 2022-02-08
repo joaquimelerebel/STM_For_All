@@ -127,7 +127,7 @@ def file_read(file):
     if not os.path.exists(app.config['OUTPUT_FOLDER']):
         os.makedirs(app.config['OUTPUT_FOLDER'])
 
-    path = app.config['OUTPUT_FOLDER'] + file + '.jpg'
+    path = app.config['OUTPUT_FOLDER'] + file[:-4] + '.jpg'
     img.save(path, 'JPEG')
 
     # closing the file
