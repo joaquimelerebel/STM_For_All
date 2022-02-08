@@ -1,4 +1,5 @@
 {% extends "template.html" %} {% block content %}
+
 <form method="post" enctype="multipart/form-data">
   <div class="container" style="margin-top: 20px">
     <div class="row">
@@ -28,14 +29,4 @@
     </div>
   </div>
 </form>
-
-<div class="container" style="margin-top: 20px">
-  {% if imgpath%}
-  <h4 style="margintop: 2%">{{imgpath}}</h4>
-  <img
-    src=".{{imgpath}}"
-    style="width: 100%; margintop: 2%"
-    alt="result of computation"
-  />
-  {% endif %} {% endblock %}
-</div>
+{% endblock %}

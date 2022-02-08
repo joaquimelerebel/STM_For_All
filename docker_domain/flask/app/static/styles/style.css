@@ -17,6 +17,14 @@ body {
     background-color: #ffffff
 }
 
+
+.main {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    flex: auto 1 auto;
+}
+
 .title {
     color: #131313;
     font-size: 48px;

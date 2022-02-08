@@ -9,7 +9,7 @@ from flask import Flask, flash, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = './data'
-ALLOWED_EXTENSIONS = ['', 'npy']
+ALLOWED_EXTENSIONS = ['mst', 'npy']
 OUTPUT_FOLDER = './static/img/results/'
 
 app = Flask(__name__)
@@ -46,7 +46,6 @@ def upload_file():
             if not os.path.exists(app.config['UPLOAD_FOLDER']):
                 os.makedirs(app.config['UPLOAD_FOLDER'])
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            print('Saved in ', os.path.join(app.config['UPLOAD_FOLDER']))
             return redirect(url_for('watch_file', file=filename))
         else:
             flash('Wrong extension. Allowed extensions : ' +
@@ -55,7 +54,7 @@ def upload_file():
                   str(ALLOWED_EXTENSIONS).strip('[]'))
             return redirect(request.url)
 
-    return render_template("main.html")
+    return render_template("uploadFile.html")
 
 
 @app.route("/watch/<file>", methods=['GET', 'POST'])
@@ -68,7 +67,7 @@ def watch_file(file):
         # render main and the image
         return render_template("image.html", imgpath=path)
 
-    elif (file.endswith((''))):
+    elif (file.endswith(('.mst'))):
         path = file_read(file)
         return render_template("image.html", imgpath=path)
     else:
@@ -138,5 +137,6 @@ def file_read(file):
 
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+    port = 5000
+    url = "http://127.0.0.1:{0}".format(port)
+    app.run(use_reloader=False, debug=True, port=port)

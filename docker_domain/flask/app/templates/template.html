@@ -4,9 +4,14 @@
     <meta charset="UTF-8 /" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MSTechnologies Software</title>
+    <!-- Stylesheets -->
     <link
       rel="stylesheet"
       href="{{ url_for('static',filename='styles/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/footer.css') }}"
     />
     <!-- Bootstrap core CSS -->
     <link
@@ -15,15 +20,66 @@
       integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
       crossorigin="anonymous"
     />
+
   </head>
+  
   <body>
-    <img
-      src="../static/img/mst-logo.png"
-      alt="MST LOGO"
-      height="100px"
-      onclick="document.location.replace('127.0.0.1:5000');"
-    />
-    {% block content %}{% endblock %}
+    <div class="main">
+      <!-- Header -->
+      <div style="padding-left: 2%">
+        <a href={{ url_for('upload_file') }}>
+          <img src="../static/img/mst-logo.png" alt="MST LOGO" height="100px" />
+        </a>
+      </div>
+      
+      <!-- Variable block  -->
+
+      {% block content %}{% endblock %}
+
+      <!-- Alerts  -->
+      <div class='alert-fixed'>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger align-items-center d-flex alert-dismissible fade show" role="alert">
+              <ion-icon name="warning"></ion-icon>
+              <strong>Warning: </strong> {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+      </div>
+      <!-- Copyrights -->
+      <div class="footer-basic" >
+        <footer>
+              <div class="social">
+                <a href="#">
+                  <ion-icon name="logo-instagram"></ion-icon>
+                </a>
+                <a href="#">
+                  <ion-icon name="logo-snapchat"></ion-icon>
+                </a>
+                <a href="#">
+                  <ion-icon name="logo-twitter"></ion-icon>
+                </a>
+                <a href="#">
+                  <ion-icon name="logo-facebook"></ion-icon>
+                </a>
+              <ul class="list-inline">
+                  <li class="list-inline-item"><a href="{{ url_for('upload_file') }}">Home</a></li>
+                  <li class="list-inline-item"><a href="#">Services</a></li>
+                  <li class="list-inline-item"><a href="#">About</a></li>
+                  <li class="list-inline-item"><a href="#">Terms</a></li>
+                  <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
+              </ul>
+              <p class="copyright">© MSTechnologies Team, copyright 2022
+                under creative commons, all rights reserved.</p>
+          </footer>
+      </div>
+    </div>
+    <!-- End -->
 
     <!-- JQUERY -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -31,10 +87,12 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
