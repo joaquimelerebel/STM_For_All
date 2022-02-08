@@ -1,0 +1,13 @@
+{% extends "template.html" %} {% block content %}
+
+<div class="container" style="margin-top: 20px; max-height: 700px">
+  {% if imgpath%}
+  <h4 style="margintop: 2%">Result :</h4>
+  <img
+    class="img-fluid"
+    src=".{{imgpath}}"
+    style="width: 100%; margintop: 2%; maxheight: 500px"
+    alt="result of computation"
+  />
+  {% endif %} {% endblock %}
+</div>
