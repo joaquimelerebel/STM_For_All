@@ -6,9 +6,18 @@ class Config :
         self.simulation_filename = args.simulation_filename;
         self.is_exponential_scale = args.exponential;
         self.is_statistical = args.statisics;
-        self.is_bin = args.bin;
-        self.isNumpyBin = False;
 
+
+        if( args.output_type == "ASCII" ) :
+            self.isNumpyBin = False;
+            self.is_bin = False;
+        if( args.output_type == "BIN_NP" ) :
+            self.isNumpyBin = True;
+            self.is_bin = True;
+        if( args.output_type == "BIN_MST" ) :
+            self.isNumpyBin = False;
+            self.is_bin = True;
+        
         if( args.error_type == "normal") : 
             self.is_normal_error = True;
             self.is_uniform_error = False;
