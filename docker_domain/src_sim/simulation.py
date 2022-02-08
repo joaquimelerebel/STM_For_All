@@ -1,10 +1,15 @@
 import sys
 import os
-import config as conf
 import struct
 from math import exp, log
 from PIL import Image
 from numpy import asarray, random, std, zeros, save
+
+import config as conf
+VERSION=0
+PATCH=1
+LEN=6
+
 
 # get
 class FileWriter:
@@ -47,24 +52,29 @@ class FileWriter:
                 if( self.config.isNumpyBin == True ):
                     save(self.config.output_filename, arr)
                 else : 
-                    breakpoint()
                     with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o444), "wb") as f:
                         # set the header up
                         #file type identifier
-                        b_mst = struct.pack(">s", b"MST");
-                        f.write(b_width);
+                        f.write(b"MST");
                         #version control 
                         b_ver = struct.pack(">h", VERSION);
-                        f.write(b_width);
-                        #patch control
+                        f.write(b_ver);
+                        #patch control 
+                        b_patch = struct.pack(">h", PATCH);
+                        f.write(b_patch);
                         #length of each data point, in power of 2
+                        b_len = struct.pack(">B", LEN);
+                        f.write(b_len);
                         #height
-                        b_width = struct.pack(">i", self.width);
-                        f.write(b_width);
-                        #width
                         b_height = struct.pack(">i", self.height);
-                        f.write(b_height)
+                        f.write(b_height);
+                        #width
+                        b_width = struct.pack(">i", self.width);
+                        f.write(b_width)
                         #metadata(16 bytes)
+                        for i in range(0, 16):
+                            b_blank = struct.pack(">b", 0);
+                            f.write(b_blank);
                         #data
                         for h in range(0, self.height) :
                             for w in range(0, self.width) :
