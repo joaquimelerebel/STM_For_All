@@ -1,0 +1,32 @@
+{% extends "template.html" %} {% block content %}
+
+<form method="post" enctype="multipart/form-data">
+  <div class="container" style="margin-top: 20px">
+    <div class="row">
+      <div>
+        <h4>Documents</h4>
+        <div class="input-group">
+          <span class="input-group-btn">
+            <span class="btn btn-primary btn-file">
+              Browse&hellip;
+              <input
+                type="file"
+                name="file"
+                id="filepicker"
+                onchange="$('#filetext').val($('#filepicker')[0].files[0].name); "
+                single
+              />
+            </span>
+          </span>
+          <input type="text" id="filetext" class="form-control" readonly />
+          <input
+            class="btn btn-primary btn-file"
+            type="submit"
+            value="Upload"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

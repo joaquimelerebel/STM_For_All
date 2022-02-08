@@ -1,0 +1,76 @@
+/* 
+// Colors
+main: "#1C1C1C",
+light: "#242429",
+dark: "#131313",
+contrastText: "#ffffff",
+textFont: "Montserrat",
+
+// Breakpoints
+xs: 0,
+sm: 600,
+md: 900,
+lg: 1200,
+xl: 1536, */
+
+body {
+    background-color: #ffffff
+}
+
+.main {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    flex: auto 1 auto;
+}
+
+.title {
+    color: #131313;
+    font-size: 48px;
+    margin-left: 2%
+}
+
+.input {
+    color: #131313;
+}
+
+.btn-primary, .btn-primary:visited {
+    background: #23052c !important;
+    border-color: #23052c !important;
+}
+
+.btn-primary:hover, .btn-primary:active{
+    background: #390847 !important;
+    border-color: #390847 !important;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+  }
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+  }
+
+input[readonly] {
+    background-color: white !important;
+    cursor: text !important;
+    box-shadow: none;
+
+  }
+
+input[readonly]:hover {
+    box-shadow: none;
+}

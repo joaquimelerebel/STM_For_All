@@ -3,7 +3,6 @@
 - [STM FOR ALL](#stm-for-all)
   - [How to install](#how-to-install)
   - [To run the simulator](#to-run-the-simulator)
-  - [To show an image](#to-show-an-image)
   - [Requirements](#requirements)
   - [What is currently not working](#what-is-currently-not-working)
   
