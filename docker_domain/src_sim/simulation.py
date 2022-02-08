@@ -3,12 +3,12 @@ import os
 import struct
 from math import exp, log
 from PIL import Image
-from numpy import asarray, random, std, zeros, save
+from numpy import asarray, random, std, zeros, save, uint8
 
 import config as conf
-VERSION=0
-PATCH=1
-LEN=6
+VERSION = 0
+PATCH = 1
+LEN = 6
 
 
 # get
@@ -31,9 +31,9 @@ class FileWriter:
         self.height = height
         self.width = width
         if(self.isCaching == False):
-            print("[ " + str(width) + ", " + str(height) + " ]\n")
+            print("[ " + str(height) + ", " + str(width) + " ]\n")
         elif(self.isBin == False):
-            self.cache += "[ " + str(width) + ", " + str(height) + " ]\n"
+            self.cache += "[ " + str(height) + ", " + str(width) + " ]\n"
 
     def writePoint(self, point, isStop):
         if(self.isCaching == False):
@@ -49,38 +49,38 @@ class FileWriter:
     def writeAll(self, arr):
         if(self.isCaching == True):
             if(self.isBin == True):
-                if( self.config.isNumpyBin == True ):
+                if(self.config.isNumpyBin == True):
                     save(self.config.output_filename, arr)
-                else : 
+                else:
                     with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o444), "wb") as f:
                         # set the header up
-                        #file type identifier
-                        f.write(b"MST");
-                        #version control 
-                        b_ver = struct.pack(">h", VERSION);
-                        f.write(b_ver);
-                        #patch control 
-                        b_patch = struct.pack(">h", PATCH);
-                        f.write(b_patch);
-                        #length of each data point, in power of 2
-                        b_len = struct.pack(">B", LEN);
-                        f.write(b_len);
-                        #height
-                        b_height = struct.pack(">i", self.height);
-                        f.write(b_height);
-                        #width
-                        b_width = struct.pack(">i", self.width);
+                        # file type identifier
+                        f.write(b"MST")
+                        # version control
+                        b_ver = struct.pack(">h", VERSION)
+                        f.write(b_ver)
+                        # patch control
+                        b_patch = struct.pack(">h", PATCH)
+                        f.write(b_patch)
+                        # length of each data point, in power of 2
+                        b_len = struct.pack(">B", LEN)
+                        f.write(b_len)
+                        # height
+                        b_height = struct.pack(">i", self.height)
+                        f.write(b_height)
+                        # width
+                        b_width = struct.pack(">i", self.width)
                         f.write(b_width)
-                        #metadata(16 bytes)
+                        # metadata(16 bytes)
                         for i in range(0, 16):
-                            b_blank = struct.pack(">b", 0);
-                            f.write(b_blank);
-                        #data
-                        for h in range(0, self.height) :
-                            for w in range(0, self.width) :
-                                b_point = struct.pack(">d", arr[h, w]);
-                                f.write( b_point )
-            else :
+                            b_blank = struct.pack(">b", 0)
+                            f.write(b_blank)
+                        # data
+                        for h in range(0, self.height):
+                            for w in range(0, self.width):
+                                b_point = struct.pack(">d", arr[h, w])
+                                f.write(b_point)
+            else:
                 with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o444), "w") as f:
                     f.write(self.cache)
 
@@ -97,6 +97,7 @@ class FileWriter:
 # .
 # .
 # x1yheight, x2yheight, ... xwidthyheight
+
 
 def sim_image(config: conf.Config):
     image = Image.open(config.simulation_filename).convert('L')
@@ -116,7 +117,6 @@ def sim_image(config: conf.Config):
     #f.write( "[ " + str( width ) + ", " + str( height )  + " ]\n" );
     fw.setWidthHeight(height, width)
 
-    
     # creation of the image statistics
     if(config.is_statistical):
         dataflatten = data.flatten()
@@ -136,10 +136,11 @@ def sim_image(config: conf.Config):
 
             # error generation
             if(config.is_normal_error):
-                dataSet[h, w] = data[h, w] + random.normal(config.error_mean, config.error)
+                dataSet[h, w] = data[h, w] + \
+                    random.normal(config.error_mean, config.error)
             elif(config.is_uniform_error):
                 dataSet[h, w] = data[h, w] + random.uniform(0-(config.error/2),
-                                   config.error/2) + config.error_mean
+                                                            config.error/2) + config.error_mean
             else:
                 dataSet[h, w] = data[h, w]
             # breakpoint();
@@ -169,19 +170,16 @@ def sim_image(config: conf.Config):
             data_voltages[h, w] = data_voltage
 
             # printing result
-            # if( w == width-1 ) :
-            #    f.write( str( data_voltage ) + '\n' );
-            # else :
-            #    f.write( str( data_voltage ) + ", " );
             if(w == width-1):
                 fw.writePoint(data_voltage, True)
             else:
                 fw.writePoint(data_voltage, False)
 
-
-    # if( isinstance(config.output_filename, str) ) :
-    #    f.close()
     fw.writeAll(data_voltages)
+
+    # verification
+    #im = Image.fromarray(uint8(data_voltages*255/5));
+    # im.save("imgoutput.png");
 
     if(config.is_statistical):
 

@@ -1,22 +1,21 @@
-import os
-
 from flask import Flask, flash, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
+
+import os
 
 from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
 
-UPLOAD_FOLDER = './data'
+
+UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
 OUTPUT_FOLDER = './static/img/results/'
-INPUT_FOLDER = './data/'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ww55z6e98a+f32h547r8e7'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
-app.config['INPUT_FOLDER'] = INPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
 
@@ -59,22 +58,22 @@ def upload_file():
 
 @app.route("/watch/<file>", methods=['GET', 'POST'])
 def watch_file(file):
-    if os.path.exists(str(app.config['INPUT_FOLDER']) + str(file)) == False:
+    if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
         return redirect(request.url)
 
     if (file.endswith((".npy"))):
         path = binary_read(
-            file, app.config['INPUT_FOLDER'], app.config['OUTPUT_FOLDER'])
+            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         # render main and the image
         return render_template("image.html", imgpath=path)
 
     elif (file.endswith(('.mst'))):
         path = file_read(
-            file, app.config['INPUT_FOLDER'], app.config['OUTPUT_FOLDER'])
+            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         return render_template("image.html", imgpath=path)
     elif (file.endswith(('.bst'))):
         path = custom_read(
-            file, app.config['INPUT_FOLDER'], app.config['OUTPUT_FOLDER'])
+            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         if path == 0:
             return render_template("uploadFile.html")
         return render_template("image.html", imgpath=path)
