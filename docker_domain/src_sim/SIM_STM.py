@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 import sys
-import argparse 
+import argparse
 import numpy as np
 import createmap
 import cmd_int as cmd
@@ -10,7 +10,7 @@ import config as conf
 
 
 def main():
-
+  
     if len( sys.argv ) <= 1 :
         cmd.eprint_RED( "Not enough arguments" );
         exit();
@@ -48,33 +48,32 @@ def main():
             help="""the error type can be : \"normal\"
             (ERROR is the standard deviation of the
             distribution and the mean is 0) or can be
-            \"uniform\" (ERROR is the maximum error, default) Be careful, the error is applied before the uniform or expodential transformation to voltage""" );
+            \"uniform\" (ERROR is the maximum error, default) Be careful, the error is applied before the uniform or exponential transformation to voltage""" );
 
-    parser.add_argument("-exp", "--expodential", 
+    parser.add_argument("-exp", "--exponential", 
             action="store_true",
             default=False,
-            help="scale the sim output expodentialy" );
+            help="scale the sim output exponentialy" );
 
-    parser.add_argument("-stat", "--statisics", 
-            default=False, action="store_true",
-            help="give statistical overview of the input image and the output");
+
+    parser.add_argument("-stat", "--statisics",
+                        default=False, action="store_true",
+                        help="give statistical overview of the input image and the output")
 
     parser.add_argument("-s", "--size", 
             type=int, help="size of an edge of the square image");
 
-    parser.add_argument("-o", "--save", 
-            type=str, 
-            metavar="filename", help="output filename" );
 
-    #parser.add_argument("-d", "--dan", type=str, help="uses dan's microcontrolleur interface", action="store_true");
+    parser.add_argument("-o", "--save",
+                        type=str,
+                        metavar="filename", help="output filename")
 
-    args = parser.parse_args();
+    # parser.add_argument("-d", "--dan", type=str, help="uses dan's microcontrolleur interface", action="store_true");
 
-    config = conf.Config( args );
-    simulation.sim_image( config );
+    args = parser.parse_args()
 
-
+    config = conf.Config(args)
+    simulation.sim_image(config)
 
 if( __name__ == "__main__"  ) :
     main()
-
