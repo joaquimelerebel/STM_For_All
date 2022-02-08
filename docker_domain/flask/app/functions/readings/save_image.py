@@ -1,5 +1,6 @@
 import os
 from PIL import Image
+from numpy import uint8
 
 # Takes in the name of a binary file, a deals with the data by creating an image of the array and returns bath
 
@@ -7,7 +8,7 @@ from PIL import Image
 def save_image(filename, data, output_folder):
 
     # importing image
-    img = Image.fromarray(data, 'RGB')
+    img = Image.fromarray(uint8(data*255/5), 'L')
 
     # if there is no output folder, create one
     if not os.path.exists(output_folder):

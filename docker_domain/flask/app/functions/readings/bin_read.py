@@ -2,8 +2,8 @@ from numpy import zeros, float64, array, load
 
 from save_image import save_image
 
-
 # Takes in the name of a binary file, a deals with the data by creating an image of the array and returns bath
+
 
 def binary_read(file, input_folder, output_folder):
     filedata = load(str(input_folder) + str(file))

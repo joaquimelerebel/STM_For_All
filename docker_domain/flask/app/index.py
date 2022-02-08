@@ -1,8 +1,7 @@
-import os
-
 from flask import Flask, flash, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
+import os
 from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
@@ -83,6 +82,7 @@ def watch_file(file):
 
 
 if __name__ == "__main__":
+    app.debug = True
     port = 5000
     url = "http://127.0.0.1:{0}".format(port)
     app.run(use_reloader=False, debug=True, port=port)

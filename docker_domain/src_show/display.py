@@ -63,10 +63,6 @@ def main(filename, binary, output):
         if (binary == "-bin"):
             file, height, width = readMSTfile(filename)
 
-        im = Image.fromarray(uint8(file*255/5));
-        im.save("imgoutput.png");
-
-
         # creating our array to have our image
         value = uint8(file*255/5)
 

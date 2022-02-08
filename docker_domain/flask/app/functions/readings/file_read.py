@@ -1,7 +1,7 @@
 import re
 from numpy import asarray, zeros, float64, array
 
-from functions.readings.save_image import save_image
+from save_image import save_image
 
 # Takes in the name of a file, a deals with the data by creating an image of the array and returns bath
 
