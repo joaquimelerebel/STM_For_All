@@ -116,6 +116,7 @@ def sim_image(config: conf.Config):
     #f.write( "[ " + str( width ) + ", " + str( height )  + " ]\n" );
     fw.setWidthHeight(height, width)
 
+    
     # creation of the image statistics
     if(config.is_statistical):
         dataflatten = data.flatten()
@@ -128,21 +129,19 @@ def sim_image(config: conf.Config):
 
     # allocation of the output array of voltages
     data_voltages = zeros((height, width))
-
+    dataSet = zeros((height, width))
     # create the map of voltages
     for h in range(0, height):
         for w in range(0, width):
 
             # error generation
             if(config.is_normal_error):
-                data[h, w] = data[h, w] + \
-                    random.normal(config.error_mean, config.error)
+                dataSet[h, w] = data[h, w] + random.normal(config.error_mean, config.error)
             elif(config.is_uniform_error):
-                data[h, w] = data[h, w] + \
-                    random.uniform(0-(config.error/2),
+                dataSet[h, w] = data[h, w] + random.uniform(0-(config.error/2),
                                    config.error/2) + config.error_mean
             else:
-                data[h, w] = data[h, w]
+                dataSet[h, w] = data[h, w]
             # breakpoint();
             #  convert point to 0-5V range
             if(config.is_exponential_scale):
