@@ -61,7 +61,7 @@ Autofilled by the requirements.txt normally
 * exponential voltage output -> re-read some paper on the translation and review the equation given in the source paper(IBM)
 * JSON/stats output as a file
 
-## binary files used 
+## binary files used .bst files
 ****BIG ENDIAN****
 
 ||0|1|2|3|4|5|6|7|
