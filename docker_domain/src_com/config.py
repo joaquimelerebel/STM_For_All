@@ -7,7 +7,8 @@ class Config :
 		self.filter = args.filter;
 		self.simulation_filename = args.simulator;
 		self.is_expodential_scale = args.expodential;
-		
+	    self.isNumpyBin = False;
+
 		self.is_normal_error = args.normal_error;
 		if args.normal_error is None  : 
 			self.is_normal_error = 0;

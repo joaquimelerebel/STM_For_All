@@ -25,4 +25,13 @@ more complexe test with expodential error (in this case print the contact copper
 ## requierments 
 autofilled by the requirements.txt normally
 
+## binary files used 
 
+||0|1|2|3|4|5|6|7|
+|-|-|-|-|-|-|-|-|-|
+|0|M|S|T|version|...|...|patch|length of point in power of 2|
+|8|height|...|...|...|width|...|...|...|
+|16|metadata*|...|...|...|...|...|...|...|
+|24|...|...|...|...|...|...|...|...|
+
+* metadata : corresponds to the STM specific data (STM version/code version/PID information ... bla bla ) will be available in the next version

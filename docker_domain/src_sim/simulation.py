@@ -1,14 +1,12 @@
 import sys
 import os
 import config as conf
-
+import struct
 from math import exp, log
 from PIL import Image
 from numpy import asarray, random, std, zeros, save
 
 # get
-
-
 class FileWriter:
     def __init__(self, config: conf.Config):
         self.config = config
@@ -39,22 +37,30 @@ class FileWriter:
                 print()
         elif(self.isBin == False):
             if(isStop == True):
-                self.cache += "{:.4f}, \n".format(point)
+                self.cache += "{:.4f}\n".format(point)
             else:
                 self.cache += "{:.4f}, ".format(point)
 
     def writeAll(self, arr):
         if(self.isCaching == True):
             if(self.isBin == True):
-                if( self.isNumpyBin == True ):
+                if( self.config.isNumpyBin == True ):
                     save(self.config.output_filename, arr)
-                else :  
-                    with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "wb") as f:
-                        f.write(self.width, self.height)
-                        for w, h in zip( arr.size ) :
-                            pass
+                else : 
+                    breakpoint()
+                    with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o444), "wb") as f:
+                        # set the header up
+                        b_width = struct.pack(">i", self.width);
+                        f.write(b_width)
+                    
+                        b_height = struct.pack(">i", self.height);
+                        f.write(b_height)
+                        for h in range(0, self.height) :
+                            for w in range(0, self.width) :
+                                b_point = struct.pack(">d", arr[h, w]);
+                                f.write( b_point )
             else :
-                with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o777), "w") as f:
+                with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o444), "w") as f:
                     f.write(self.cache)
 
 # get pixel value of each pixel of the picture
@@ -88,7 +94,7 @@ def sim_image(config: conf.Config):
     #    f = sys.stdout;
     #
     #f.write( "[ " + str( width ) + ", " + str( height )  + " ]\n" );
-    fw.setWidthHeight(width, height)
+    fw.setWidthHeight(height, width)
 
     # creation of the image statistics
     if(config.is_statistical):
@@ -152,6 +158,7 @@ def sim_image(config: conf.Config):
                 fw.writePoint(data_voltage, True)
             else:
                 fw.writePoint(data_voltage, False)
+
 
     # if( isinstance(config.output_filename, str) ) :
     #    f.close()
