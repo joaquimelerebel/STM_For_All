@@ -7,6 +7,7 @@ class Config :
         self.is_exponential_scale = args.exponential;
         self.is_statistical = args.statisics;
         self.is_bin = args.bin;
+        self.isNumpyBin = False;
 
         if( args.error_type == "normal") : 
             self.is_normal_error = True;

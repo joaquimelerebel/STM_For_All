@@ -22,7 +22,15 @@ Go into the folder src\_sim in the docker container
 To do the firsts tests:
 
 `python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5`
-img
+
+Help:
+
+`python3 SIM_STM.py -h`
+
+More complexe test with expodential error (in this case print the contact copper with a normal error stdev of 0.5, mean of 0.12, expodential scaling at the output and statistics available of the different transformations) :
+`python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5 -errtype normal -stat -errM 0.12 -exp`
+
+## To show an image
 
 Go to `src_show`.
 
@@ -42,15 +50,26 @@ To convert the matrix to an image, we have three parameters:
 python3 display.py output -f myFile.jpg
 ```
 
+
 ## Requirements
 
 Autofilled by the requirements.txt normally
 
-More complexe test with expodential error (in this case print the contact copper with a normal error stdev of 0.5, mean of 0.12, expodential scaling at the output and statistics available of the different transformations) :
-`python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5 -errtype normal -stat -errM 0.12 -exp`
 
 ## What is currently not working
 
 * exponential voltage output -> re-read some paper on the translation and review the equation given in the source paper(IBM)
 * JSON/stats output as a file
-* error mean center cannot be chosen
+
+## binary files used 
+****BIG ENDIAN****
+
+||0|1|2|3|4|5|6|7|
+|-|-|-|-|-|-|-|-|-|
+|0|M|S|T|version|...|patch|...|length of point in power of 2|
+|8|height|...|...|...|width|...|...|...|
+|16|metadata*|...|...|...|...|...|...|...|
+|24|...|...|...|...|...|...|...|...|
+
+* metadata : corresponds to the STM specific data (STM version/code version/PID information ... bla bla ) will be available in the next version
+

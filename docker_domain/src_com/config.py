@@ -16,6 +16,11 @@ class Config:
         if args.error is None:
             self.error = 0
 
+		if( args.frequence != 0 ) :
+			self.frequence = args.frequence;
+		else :
+			self.frequence = 100;
+	
         if(args.save != ""):
             self.output_filename = args.save
         else:
