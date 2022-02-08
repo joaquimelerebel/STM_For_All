@@ -59,10 +59,11 @@ Autofilled by the requirements.txt normally
 * JSON/stats output as a file
 
 ## binary files used 
+****BIG ENDIAN****
 
 ||0|1|2|3|4|5|6|7|
 |-|-|-|-|-|-|-|-|-|
-|0|M|S|T|version|...|...|patch|length of point in power of 2|
+|0|M|S|T|version|...|patch|...|length of point in power of 2|
 |8|height|...|...|...|width|...|...|...|
 |16|metadata*|...|...|...|...|...|...|...|
 |24|...|...|...|...|...|...|...|...|

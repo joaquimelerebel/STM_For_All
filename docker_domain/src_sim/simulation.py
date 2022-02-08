@@ -50,11 +50,22 @@ class FileWriter:
                     breakpoint()
                     with open(os.open(self.config.output_filename, os.O_CREAT | os.O_WRONLY, 0o444), "wb") as f:
                         # set the header up
+                        #file type identifier
+                        b_mst = struct.pack(">s", b"MST");
+                        f.write(b_width);
+                        #version control 
+                        b_ver = struct.pack(">h", VERSION);
+                        f.write(b_width);
+                        #patch control
+                        #length of each data point, in power of 2
+                        #height
                         b_width = struct.pack(">i", self.width);
-                        f.write(b_width)
-                    
+                        f.write(b_width);
+                        #width
                         b_height = struct.pack(">i", self.height);
                         f.write(b_height)
+                        #metadata(16 bytes)
+                        #data
                         for h in range(0, self.height) :
                             for w in range(0, self.width) :
                                 b_point = struct.pack(">d", arr[h, w]);
