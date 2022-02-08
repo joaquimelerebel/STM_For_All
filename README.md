@@ -3,7 +3,6 @@
 - [STM FOR ALL](#stm-for-all)
   - [How to install](#how-to-install)
   - [To run the simulator](#to-run-the-simulator)
-  - [To show an image](#to-show-an-image)
   - [Requirements](#requirements)
   - [What is currently not working](#what-is-currently-not-working)
   
@@ -23,12 +22,7 @@ Go into the folder src\_sim in the docker container
 To do the firsts tests:
 
 `python3 SIM_STM.py ../Test_Picture/ContactCopper.jpg -err 0.5`
-
-Help:
-
-`python3 SIM_STM.py -h`
-
-## To show an image
+img
 
 Go to `src_show`.
 
