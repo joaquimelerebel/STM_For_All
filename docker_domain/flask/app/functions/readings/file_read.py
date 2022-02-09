@@ -16,7 +16,7 @@ def file_read(file, input_folder, output_folder):
     size = re.sub(r"[\[-\]]", "", fileline).replace(" ", "").split(",")
 
     # preventing /n by retrieving 2 values from the width
-    height, width = asarray(size, int)-[0, 1]
+    height, width = asarray(size, int)
 
     # creating our array to have our image
     data = zeros([height, width], dtype=float64)
