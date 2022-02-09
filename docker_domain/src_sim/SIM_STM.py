@@ -28,8 +28,8 @@ def main():
     parser.add_argument( "-ot", "--output_type",
             dest="output_type", type=str,
             default="ASCII", 
-            choices=["ASCII", "BIN_NP", "BIN_MST"],
-            help="outputs type for the file format (ASCII, BIN_NP, BIN_MST)" );
+            choices=["ASCII", "BIN_NP", "BIN_MST", "C_TABLE"],
+            help="outputs type for the file format (ASCII, BIN_NP, BIN_MST, C_TABLE)" );
     
     parser.add_argument("-errM", "--error_mean", 
             default=0, type=float, 
@@ -79,7 +79,14 @@ def main():
 
     parser.add_argument("-o", "--save",
                         type=str,
-                        metavar="filename", help="output filename")
+                        default="",
+                        metavar="PATH", help="output filepath")
+
+    parser.add_argument("-serial",
+                        metavar="PATH",
+                        type=str,
+                        default="",
+                        help="should use the serial output PATH")
 
     # parser.add_argument("-d", "--dan", type=str, help="uses dan's microcontrolleur interface", action="store_true");
 
