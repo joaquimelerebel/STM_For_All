@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8 /" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <link rel="icon" href="{{ url_for('static',filename='img/logo_m_yellow.png') }}" type="image/gif">
     <title>MSTechnologies Software</title>
     <!-- Stylesheets -->
     <link
@@ -25,13 +27,25 @@
   
   <body>
     <div class="main">
+
       <!-- Header -->
-      <div style="padding-left: 2%">
-        <a href={{ url_for('upload_file') }}>
-          <img src="../static/img/mst-logo.png" alt="MST LOGO" height="100px" />
-        </a>
-      </div>
-      
+      <nav class="navbar navbar-expand-lg sticky-top navbar-dark lightgray">
+        <div class="container-fluid">
+          <a class="navbar-brand" href={{ url_for('upload_file') }}>
+            <img class="img-fluid" src="{{ url_for('static',filename='img/logo_mst_white.png') }}" width= "125px" alt="MST LOGO" />
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-link" href="#">Image</a>
+              <a class="nav-link" href="#">Device</a>
+              <a class="nav-link" href="#">Log</a>
+            </div>
+          </div>
+        </div>
+      </nav>
       <!-- Variable block  -->
 
       {% block content %}{% endblock %}
@@ -52,31 +66,7 @@
         {% block body %}{% endblock %}
       </div>
       <!-- Copyrights -->
-      <div class="footer-basic" >
-        <footer>
-              <div class="social">
-                <a href="#">
-                  <ion-icon name="logo-instagram"></ion-icon>
-                </a>
-                <a href="#">
-                  <ion-icon name="logo-snapchat"></ion-icon>
-                </a>
-                <a href="#">
-                  <ion-icon name="logo-twitter"></ion-icon>
-                </a>
-                <a href="#">
-                  <ion-icon name="logo-facebook"></ion-icon>
-                </a>
-              <ul class="list-inline">
-                  <li class="list-inline-item"><a href="{{ url_for('upload_file') }}">Home</a></li>
-                  <li class="list-inline-item"><a href="#">Services</a></li>
-                  <li class="list-inline-item"><a href="#">About</a></li>
-                  <li class="list-inline-item"><a href="#">Terms</a></li>
-                  <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
-              </ul>
-              <p class="copyright">© MSTechnologies Team, copyright 2022
-                under creative commons, all rights reserved.</p>
-          </footer>
+      
       </div>
     </div>
     <!-- End -->

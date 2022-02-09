@@ -1,21 +1,31 @@
-/* 
-// Colors
-main: "#1C1C1C",
-light: "#242429",
-dark: "#131313",
-contrastText: "#ffffff",
-textFont: "Montserrat",
+.lightgray{
+    background-color: #333333!important
+}
 
-// Breakpoints
-xs: 0,
-sm: 600,
-md: 900,
-lg: 1200,
-xl: 1536, */
+.gray{
+    background-color: #2D2D2D!important
+}
+
+.lightblack{
+    background-color: #252526!important
+}
+
+.black{
+    background-color: #1E1E1E!important
+}
 
 body {
-    background-color: #ffffff
+    background-color: #1E1E1E!important;
+    color: #FFFFFF!important;
 }
+
+.alert-fixed {
+    position:relative; 
+    margin : auto;
+    margin-top : 2%;
+    z-index:9999; 
+}
+
 
 .main {
     display: flex;
@@ -35,13 +45,13 @@ body {
 }
 
 .btn-primary, .btn-primary:visited {
-    background: #23052c !important;
-    border-color: #23052c !important;
+    background: #002843 !important;
+    border-color: #002843 !important;
 }
 
 .btn-primary:hover, .btn-primary:active{
-    background: #390847 !important;
-    border-color: #390847 !important;
+    background: #004574 !important;
+    border-color: #004574 !important;
 }
 
 .btn-file {
