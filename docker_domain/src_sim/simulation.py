@@ -73,7 +73,7 @@ class FileWriter:
             out += struct.pack(">i", self.width)
             # metadata(16 bytes)
             for i in range(0, 16):
-                out = struct.pack(">b", 0x69);
+                out += struct.pack(">b", 0x69);
 
             if( self.isCaching ) :
                 self.cache += out;
