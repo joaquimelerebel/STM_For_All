@@ -7,6 +7,8 @@ class Config :
         self.is_exponential_scale = args.exponential;
         self.is_statistical = args.statisics;
 
+        self.time = args.time;
+        self.vtime = args.vtime;
 
         if( args.output_type == "ASCII" ) :
             self.isNumpyBin = False;
