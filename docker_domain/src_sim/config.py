@@ -16,16 +16,25 @@ class Config :
         if( args.output_type == "ASCII" ) :
             self.isNumpyBin = False;
             self.is_bin = False;
+            self.isCtable16 = False;
         if( args.output_type == "BIN_NP" ) :
             self.isNumpyBin = True;
             self.is_bin = True;
+            self.isCtable16 = False;
         if( args.output_type == "BIN_MST" ) :
             self.isNumpyBin = False;
             self.is_bin = True;
+            self.isCtable16 = False;
         if( args.output_type == "C_TABLE" ) :
             self.isNumpyBin = False;
-            self.is_bin = False;
+            self.is_bin = True;
             self.isCtable = True;
+            self.isCtable16 = False;
+        if( args.output_type == "C_TABLE16" ) :
+            self.isNumpyBin = False;
+            self.is_bin = False; 
+            self.isCtable = True;
+            self.isCtable16 = True;
         
         if( args.error_type == "normal") : 
             self.is_normal_error = True;

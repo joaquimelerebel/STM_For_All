@@ -15,6 +15,7 @@ class FileWriter:
         self.isBin = False
         self.isTimed = False
         self.isCtable = config.isCtable
+        self.isCtable16 = config.isCtable16
 
         if( config.time != 0 or config.vtime != 0 ) :
             self.ltime=time()*1000;
@@ -31,6 +32,8 @@ class FileWriter:
                     self.filepath = config.output_filename if( ".npy" in config.output_filename ) else config.output_filename + ".npy"
                 else : 
                     self.filepath = config.output_filename if( ".bst" in config.output_filename ) else config.output_filename + ".bst"
+            elif( self.isCtable or self.isCtable16 ) :
+                self.filepath = config.output_filename if( ".h" in config.output_filename ) else config.output_filename + ".h"
             else :
                 self.filepath = config.output_filename if( ".mst" in config.output_filename ) else config.output_filename + ".mst"
 
@@ -53,8 +56,12 @@ class FileWriter:
         self.width = width
         # ascii 
         if( not self.isBin ):
-            if( self.isCtable ) :
-                out = ("const double table [ " + str(height) + "][" + str(width) + " ] = ");
+            if( self.isCtable16 ) :
+                out = (     f"cont int final_width = {width}\n" 
+                        +   f"const int final_height = {height}\n"  
+                        +   f"const unsigned short table [{width*height}] = " + "{");
+            elif( self.isCtable ) :
+                out = ("const double table [" + str(height) + "][" + str(width) + "] = {{");
             else : 
                 out = ("[ " + str(height) + ", " + str(width) + " ]\n");
             if( not self.isCaching ) :
@@ -107,15 +114,30 @@ class FileWriter:
                self.f.write(b_point);
         #ASCII output
         elif( not self.config.isNumpyBin ) :
+            if( self.isCtable16 ) :
+                # convert to the ADC format 
+                # ADC of 16 bits : max val 65536
+                nval = int((point*65536)/5);
+                b_point = struct.pack(">H", nval).hex() 
             if( isStop ) :
-                if( self.isCtable ) :
+                if( self.isCtable16 ) :
+                    # convert to the ADC format 
+                    # ADC of 16 bits : max val 65536
+                    nval = int((point*65536)/5);
+
+                    out = f"0x{b_point}, \n"
+                    if( h == self.height - 1 and  w == self.width - 1 ):
+                        out = f"0x{b_point}" + "};\n"
+                elif( self.isCtable ) :
                     out = f"{point:.15f}" + "},\n{"
                     if( h == self.height - 1 and  w == self.width - 1 ):
                         out = f"{point:.15f}" + "}};"
                 else : 
                     out = f"{point:.15f}\n"
+            elif(self.isCtable16) :
+                out = f"0x{b_point}, "
             else :
-                out = "{:.15f}, ".format(point)
+                out = f"{point:.15f}, ";
 
             if(self.isCaching) :
                 self.cache += out;

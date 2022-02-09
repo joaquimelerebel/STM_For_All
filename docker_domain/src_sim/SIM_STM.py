@@ -28,8 +28,8 @@ def main():
     parser.add_argument( "-ot", "--output_type",
             dest="output_type", type=str,
             default="ASCII", 
-            choices=["ASCII", "BIN_NP", "BIN_MST", "C_TABLE"],
-            help="outputs type for the file format (ASCII, BIN_NP, BIN_MST, C_TABLE)" );
+            choices=["ASCII", "BIN_NP", "BIN_MST", "C_TABLE" ,"C_TABLE16"],
+            help="outputs type for the file format (ASCII, BIN_NP, BIN_MST, C_TABLE, C_TABLE16)" );
     
     parser.add_argument("-errM", "--error_mean", 
             default=0, type=float, 
