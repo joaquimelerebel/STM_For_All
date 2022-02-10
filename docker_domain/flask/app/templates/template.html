@@ -25,13 +25,12 @@
 
   </head>
   
-  <body>
-    <div class="main">
+  <body class="dark text-white">
 
       <!-- Header -->
-      <nav class="navbar navbar-expand-lg sticky-top navbar-dark lightgray">
+      <nav class="navbar navbar-expand-lg sticky-top navbar-dark gray">
         <div class="container-fluid">
-          <a class="navbar-brand" href={{ url_for('upload_file') }}>
+          <a class="navbar-brand" href={{ url_for('main_menu') }}>
             <img class="img-fluid" src="{{ url_for('static',filename='img/logo_mst_white.png') }}" width= "125px" alt="MST LOGO" />
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,9 +38,9 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-link" href="#">Image</a>
-              <a class="nav-link" href="#">Device</a>
-              <a class="nav-link" href="#">Log</a>
+              <a class="nav-link" href={{ url_for('image_menu') }}>Image</a>
+              <a class="nav-link"  href="#">Device</a>
+              <a class="nav-link"  href="#">Log</a>
             </div>
           </div>
         </div>
@@ -65,10 +64,6 @@
         {% endwith %}
         {% block body %}{% endblock %}
       </div>
-      <!-- Copyrights -->
-      
-      </div>
-    </div>
     <!-- End -->
 
     <!-- JQUERY -->

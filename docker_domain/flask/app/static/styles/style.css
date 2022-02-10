@@ -1,43 +1,73 @@
+html, body{
+    height:100%;
+    overflow:hidden;
+}
+
 .lightgray{
-    background-color: #333333!important
+    background: #333333!important
 }
 
 .gray{
-    background-color: #2D2D2D!important
+    background: #2D2D2D!important
 }
 
-.lightblack{
-    background-color: #252526!important
+.lightdark{
+    background: #252526!important
 }
 
-.black{
-    background-color: #1E1E1E!important
-}
-
-body {
-    background-color: #1E1E1E!important;
-    color: #FFFFFF!important;
+.dark{
+    background: #1E1E1E!important
 }
 
 .alert-fixed {
-    position:relative; 
-    margin : auto;
-    margin-top : 2%;
+    position: absolute;
     z-index:9999; 
+    height: 50%;
+    width: 50%;
+    top:0.5%;
+    left:25%;
+    margin: auto;
+}
+
+.nav-link{
+    padding-left: 20% !important;
+    padding-right: 20% !important;
+}
+.nav-link:hover{
+    background-color: #252526!important;
+    border-radius: 4px!important;
+}
+
+.title{
+
+    margin-left: 2% !important;
+    margin-top: 1% !important
+}
+
+.menu{
+    padding: 1% !important;
+    max-width: fit-content;
+}
+
+.menu-element{
+    margin: 6% !important;
 }
 
 
-.main {
+.rowdisp {
+    display: flex;
+    flex-flow: row;
+    height:100%;
+    width: 100%;
+    flex: 1 1 auto;
+}
+.coldisp {
     display: flex;
     flex-flow: column;
-    height: 100%;
-    flex: auto 1 auto;
-}
-
-.title {
-    color: #131313;
-    font-size: 48px;
-    margin-left: 2%
+    height:100%;
+    width: 100%;
+    flex: 1 1 auto;
+    justify-content: flex-start;
 }
 
 .input {

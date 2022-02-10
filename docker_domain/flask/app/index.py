@@ -25,7 +25,17 @@ def allowed_file(filename):
            ) in app.config['ALLOWED_EXTENSIONS']
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/")
+def main_menu():
+    return render_template("mainMenu.html",)
+
+
+@app.route("/image")
+def image_menu():
+    return render_template("imageMenu.html",)
+
+
+@app.route("/image/upload", methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -53,10 +63,10 @@ def upload_file():
                   str(ALLOWED_EXTENSIONS).strip('[]'))
             return redirect(request.url)
 
-    return render_template("uploadFile.html")
+    return render_template("uploadFile.html", format=app.config['ALLOWED_EXTENSIONS'])
 
 
-@app.route("/watch/<file>", methods=['GET', 'POST'])
+@app.route("/image/watch/<file>", methods=['GET', 'POST'])
 def watch_file(file):
     if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
         return redirect(request.url)
@@ -65,18 +75,18 @@ def watch_file(file):
         path = binary_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         # render main and the image
-        return render_template("image.html", imgpath=path)
+        return render_template("watchImage.html", imgpath=path)
 
     elif (file.endswith(('.mst'))):
         path = file_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-        return render_template("image.html", imgpath=path)
+        return render_template("watchImage.html", imgpath=path)
     elif (file.endswith(('.bst'))):
         path = custom_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         if path == 0:
             return render_template("uploadFile.html")
-        return render_template("image.html", imgpath=path)
+        return render_template("watchImage.html", imgpath=path)
     else:
         print("Wrong parameters")
 

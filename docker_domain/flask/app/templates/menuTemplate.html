@@ -1,0 +1,23 @@
+{% extends "template.html" %} {% block content %}
+<div class="rowdisp">
+  <div class="lightgray container-fluid menu">
+    <div class="coldisp"> 
+      <a href={{ url_for('upload_file') }}>
+        <button type="button" class="btn btn-primary menu-element">
+          Upload a file 
+        </button>
+      </a>
+      <button type="button" class="btn btn-primary menu-element">
+        Option 1
+      </button>
+      <button type="button" class="btn btn-primary menu-element">
+        Option 2
+      </button>
+      <button type="button" class="btn btn-primary menu-element">
+        Option n
+      </button>
+    </div>
+  </div>
+  {% block mainpage %}{% endblock %}
+</div>
+{% endblock %}

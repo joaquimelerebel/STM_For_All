@@ -1,32 +1,42 @@
-{% extends "template.html" %} {% block content %}
-
-<form method="post" enctype="multipart/form-data">
+{% extends "menuTemplate.html" %}{% block mainpage %}
+<div class="coldisp">
+  <h2 class="title">Upload a file</h2>
   <div class="container" style="margin-top: 20px">
-    <div class="row">
-      <div>
-        <h4>Documents</h4>
-        <div class="input-group">
-          <span class="input-group-btn">
-            <span class="btn btn-primary btn-file">
-              Browse&hellip;
-              <input
-                type="file"
-                name="file"
-                id="filepicker"
-                onchange="$('#filetext').val($('#filepicker')[0].files[0].name); "
-                single
-              />
+    <form method="post" enctype="multipart/form-data">
+      <div class="row">
+        <div>
+          <div class="input-group">
+            <span class="input-group-btn">
+              <span class="btn btn-primary btn-file">
+                Browse&hellip;
+                <input
+                  type="file"
+                  name="file"
+                  id="filepicker"
+                  onchange="$('#filetext').val($('#filepicker')[0].files[0].name); "
+                  single
+                />
+              </span>
             </span>
-          </span>
-          <input type="text" id="filetext" class="gray form-control" readonly />
-          <input
-            class="btn btn-primary btn-file"
-            type="submit"
-            value="Upload"
-          />
+            <input
+              type="text"
+              id="filetext"
+              style="background: #333333 !important; border: 0px"
+              class="form-control text-white"
+              readonly
+            />
+            <input
+              class="btn btn-primary btn-file"
+              type="submit"
+              value="Upload"
+            />
+          </div>
+          <p style="text-align: center; margin-top: 1%">
+            Accepted format: {{format}}
+          </p>
         </div>
       </div>
-    </div>
+    </form>
   </div>
-</form>
+</div>
 {% endblock %}

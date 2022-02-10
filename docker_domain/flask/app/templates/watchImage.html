@@ -1,0 +1,18 @@
+{% extends "template.html" %} {% block content %}
+
+<div class="container">
+  {% if imgpath%}
+
+  <div style="margin-top: 2% !important; margin: auto; text-align: center">
+    <h4>Result</h4>
+    <p>.{{imgpath}}</p>
+    <img
+      class="img-fluid"
+      src=".{{imgpath}}"
+      style="margintop: 2%"
+      alt="Lacking image - Result of computation"
+    />
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
