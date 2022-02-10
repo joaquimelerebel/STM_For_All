@@ -50,9 +50,10 @@
       {% block content %}{% endblock %}
 
       <!-- Alerts  -->
-      <div class='alert-fixed'>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
+
+      <div class='alert-fixed'>
             {% for message in messages %}
             <div class="alert alert-danger align-items-center d-flex alert-dismissible fade show" role="alert">
               <ion-icon name="warning"></ion-icon>
@@ -61,9 +62,10 @@
             </div>
             {% endfor %}
           {% endif %}
+
+      </div>
         {% endwith %}
         {% block body %}{% endblock %}
-      </div>
     <!-- End -->
 
     <!-- JQUERY -->
