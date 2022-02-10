@@ -57,8 +57,8 @@ class FileWriter:
         # ascii 
         if( not self.isBin ):
             if( self.isCtable16 ) :
-                out = (     f"cont int final_width = {width}\n" 
-                        +   f"const int final_height = {height}\n"  
+                out = (     f"const int final_width = {width};\n" 
+                        +   f"const int final_height = {height};\n"  
                         +   f"const unsigned short table [{width*height}] = " + "{");
             elif( self.isCtable ) :
                 out = ("const double table [" + str(height) + "][" + str(width) + "] = {{");
