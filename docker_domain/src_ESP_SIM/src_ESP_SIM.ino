@@ -1,13 +1,8 @@
 
-#include "logTable.h"
+//#include "logTable.h"
 #include "matrix.h"
 
-// DAC and ADC resolution:
-#define DAC_BITS 16                        // Actual DAC resolution
-#define POSITION_BITS 20                   // Sigma-delta resolution
-#define ADC_BITS 16
-
-
+#define DATA_BUFFER_LENGTH 16386
 // Default scan settings:
 #define SCAN_SIZE 100000 // ~160 nm        // Scan size in LSBs
 #define IMAGE_PIXELS 512                   // Scan size in pixels
@@ -28,6 +23,9 @@
 
 
 
+// Sample, pixel and line counters:
+volatile unsigned int sampleCounter = 0, pixelCounter = 0, lineCounter = 0;
+volatile int zAvg = 0, eAvg = 0; // Accumulates Z and error samples for later averaging
 // Scan parameters:
 float lineRate = LINE_RATE; // Scan lines per second
 unsigned int pixelsPerLine = IMAGE_PIXELS * 2;
@@ -45,11 +43,6 @@ volatile int yCount = -SCAN_COUNTER_LIMIT; // Y-axis scan counter
 volatile int dx = 0, dy = 0; // Scan counter increments
 
 
-// Sample, pixel and line counters:
-volatile unsigned int sampleCounter = 0, pixelCounter = 0, lineCounter = 0;
-volatile int zAvg = 0, eAvg = 0; // Accumulates Z and error samples for later averaging
-
-
 // Ping-pong buffers:
 byte data1[DATA_BUFFER_LENGTH], data2[DATA_BUFFER_LENGTH]; // Data buffers
 volatile boolean fillData1 = true; // Indicates which buffer to fill
@@ -58,7 +51,7 @@ boolean serialEnabled = false; // Enables serial transfer of data
 
 
 // Position variables:
-const int MAX_Z = (1 << (POSITION_BITS - 1)) - 1; // Maximum Z value
+//const int MAX_Z = (1 << (POSITION_BITS - 1)) - 1; // Maximum Z value
 int xo = 0, yo = 0; // Scan offsets
 volatile int x = 0, y = 0, z = 0; // Scanner coordinates in LSBs
 
@@ -70,28 +63,12 @@ int Kp = KP, Ki = KI; // Proportional and integral gains
 volatile int16_t input; // ADC input data
 volatile int error = 0; // PID error signal
 volatile int64_t iTerm = 0; // Integral term
-const int64_t MAX_ITERM = MAX_Z * 0x100000000; // Maximum integral term. Used to prevent windup.
+//const int64_t MAX_ITERM = MAX_Z * 0x100000000; // Maximum integral term. Used to prevent windup.
 
 
 // Sigma-delta variables:
 int sigmaX = 0, sigmaY = 0, sigmaZ = 0; // Sigma-delta integrators
-const unsigned int shift = POSITION_BITS - DAC_BITS; // Number of bits to increase DAC resolution by using sigma-delta algorithm
-
-
-// Timers:
-IntervalTimer scanTimer;
-
-
-// Data converters:
-//DAC8814 dac(CS_DAC, LDAC); // 16-bit quad DAC
-//LTC2326_16 adc(CS_ADC, CNV, BUSY); // 16-bit ADC
-const int MAX_DAC_OUT = (1 << (DAC_BITS - 1)) - 1; // DAC upper bound
-const int MIN_DAC_OUT = -(1 << (DAC_BITS - 1)); // DAC lower bound
-boolean saturationCompensation = true; // The LTC2326-16 seems to output 0 when its input saturates. This is a temporary fix.
-
-
-
-int table_index = 0;
+//const unsigned int shift = POSITION_BITS - DAC_BITS; // Number of bits to increase DAC resolution by using sigma-delta algorithm
 
 hw_timer_t * timer = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
@@ -101,21 +78,12 @@ void IRAM_ATTR incrementScan(void);
 
 void setup()
 {
-
-		digitalWrite(SERIAL_LED, LOW);
-		digitalWrite(TUNNEL_LED, LOW);
-
-		setpointLog = logTable[abs(SETPOINT)]; // Take the log of the setpoint
-		updateStepSizes(); // Compute the scan counter step sizes  
-
 		// Start the scan/PI/sigma-delta timer:
-		timer = timerBegin(0, dt, true);		
+		timer = timerBegin(0, 10, true);		
 		timerAttachInterrupt(timer, &incrementScan, true);
 		timerAlarmWrite(timer, 100000, true);
 		timerAlarmEnable(timer);
-		//scanTimer.priority(0);
-		//scanTimer.begin(incrementScan, dt);
-}
+	}
 
 
 /**************************************************************************/
@@ -128,14 +96,10 @@ void loop()
 {
 		checkSerial(); // Check for incoming serial commands. See "SerialCommands" tab.
 
-		// Illuminate tunelling LED if the tunneling current is > setpoint/2:
-		if(abs(input) > setpoint >> 1) digitalWriteFast(TUNNEL_LED, HIGH);
-		else digitalWriteFast(TUNNEL_LED, LOW);
-
 		// Send data over USB if a line has been scanned and re-scanned:
 		if(sendData)
 		{    
-				if(!fillData1) // Print data1
+				//if(!fillData1) // Print data1
 				{
 						data1[0] = (byte)((lineCounter >> 8) & 0xFF); // High byte
 						data1[1] = (byte)(lineCounter & 0xFF); // Low byte
@@ -155,7 +119,7 @@ void loop()
 						   }
 						 */
 				}
-				else
+				/*else
 				{
 						data2[0] = (byte)((lineCounter >> 8) & 0xFF); // High byte
 						data2[1] = (byte)(lineCounter & 0xFF); // Low byte
@@ -164,7 +128,7 @@ void loop()
 						{
 								Serial.println("DATA");
 								Serial.write(data2, DATA_BUFFER_LENGTH);
-						}
+						}*/
 
 						// Uncomment this block to print human-readable data to the serial port:
 						/*
@@ -174,7 +138,7 @@ void loop()
 						   Serial.print(" ");
 						   }
 						 */     
-				}
+				//}
 				Serial.println();
 
 				sendData = false;
@@ -193,9 +157,10 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 {  
 		static int xout, yout, zout;
 		static int64_t pTerm;
-
+    int table_index;
+    
 		portENTER_CRITICAL_ISR(&timerMux);
-		interruptCounter++;
+		//interruptCounter++;
 		portEXIT_CRITICAL_ISR(&timerMux);
 	
 		//////////////////////////////////////////////////////////////////////
@@ -204,13 +169,13 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 
 		if(scanningEnabled)
 		{
-				if(xCount <= -SCAN_COUNTER_LIMIT || xCount >= SCAN_COUNTER_LIMIT - 1 - dx) dx = -dx; // Reverse at the end of a line
+				if(xCount <= 0 || xCount >= final_width - 1 - dx) dx = -dx; // Reverse at the end of a line
 				xCount += dx;
 				x = (int)(((int64_t)xCount * (int64_t)scanSize) >> 31) + xo;
-				if(yCount <= -SCAN_COUNTER_LIMIT || yCount >= SCAN_COUNTER_LIMIT - 1 - dy) dy = -dy; // Reverse and the end of a scan
+				if(yCount <= 0 || yCount >= final_height - 1 - dy) dy = -dy; // Reverse and the end of a scan
 				yCount += dy;
 				y = (int)(((int64_t)yCount * (int64_t)scanSize) >> 31) + yo;
-				if(yCount <= -SCAN_COUNTER_LIMIT) lineCounter = 0; // Just in case the scan and acquisition become desynchronized...
+				if(yCount <= 0) lineCounter = 0; // Just in case the scan and acquisition become desynchronized...
 		}
 
 		//////////////////////////////////////////////////////////////////////
@@ -220,13 +185,13 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 		//adc.begin(); // Set up the SPI port to communicate with the ADC
 		//input = adc.read(); // Read the ADC data over SPI
 		// SIMULATION 
+    
+		input = table[ (yCount*final_width) + xCount*final_width ]; 
+   
+	 // if(saturationCompensation & (input == 0) & (z != -MAX_Z)) input = 32767; // Compensate for the LTC2326-16 saturation issue
+		//error = logTable[abs((int16_t)input)] - setpointLog; // Negative error = tip too far from sample
 
-		input = table[table_index];
-		table_index++;
-		if(saturationCompensation & (input == 0) & (z != -MAX_Z)) input = 32767; // Compensate for the LTC2326-16 saturation issue
-		error = logTable[abs((int16_t)input)] - setpointLog; // Negative error = tip too far from sample
-
-		if(pidEnabled)
+		/*if(pidEnabled)
 		{
 				pTerm = (int64_t)Kp * (int64_t)error;
 				iTerm += (int64_t)Ki * (int64_t)error;
@@ -234,7 +199,7 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 				else if (iTerm < -MAX_ITERM) iTerm = -MAX_ITERM;
 				z = (int)(((pTerm + iTerm) >> 32) & 0xFFFFFFFF);
 				z = saturate(z, MAX_Z, -MAX_Z);
-		}
+		}*/
 		//adc.convert(); // Initiate a new conversion. Data will be ready by the next time this interrupt runs.  
 
 
@@ -257,7 +222,8 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 		//////////////////////////////////////////////////////////////////////
 		// Store data in buffer arrays and update counters:
 		//////////////////////////////////////////////////////////////////////
-
+    
+    int z = input;
 		if(scanningEnabled)
 		{
 				zAvg += z; // Accumulate data for averaging
@@ -312,6 +278,7 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 						}
 				}
 		}
+   
 }
 
 
@@ -362,13 +329,13 @@ void updateStepSizes()
 		int new_dx = (SCAN_COUNTER_LIMIT - 1)/ ((int)new_samplesPerPixel * (int)pixelsPerLine) * 4;
 		int new_dy = new_dx / (int)pixelsPerLine;
 
-		noInterrupts();
+		portDISABLE_INTERRUPTS();
 		samplesPerPixel = new_samplesPerPixel;
 		if(dx > 0) dx = new_dx;
 		else dx = -new_dx;
 		if(dy > 0) dy = new_dy;
 		else dy = -new_dy;
-		interrupts();
+		portENABLE_INTERRUPTS();
 }
 
 
@@ -380,7 +347,7 @@ void updateStepSizes()
 
 void resetScan()
 {
-		int xStart = -(scanSize >> 1) + xo;
+		/*int xStart = -(scanSize >> 1) + xo;
 		int yStart = -(scanSize >> 1) + yo;
 
 		scanningEnabled = false; // disable scanning
@@ -401,7 +368,7 @@ void resetScan()
 		interrupts();
 
 		// Move to start position:
-		moveTip(xStart, yStart);
+		moveTip(xStart, yStart);*/
 }
 
 
@@ -413,7 +380,7 @@ void resetScan()
 
 void moveTip(int xf, int yf)
 {
-		int stepSize = abs((int)(((int64_t)dx * (int64_t)scanSize) >> 31));
+		/*int stepSize = abs((int)(((int64_t)dx * (int64_t)scanSize) >> 31));
 
 		scanningEnabled = false;
 
@@ -432,7 +399,7 @@ void moveTip(int xf, int yf)
 		while (y < yf) {
 				y += stepSize;
 				waitTimeStep();
-		}
+		}*/
 }
 
 
@@ -444,11 +411,11 @@ void moveTip(int xf, int yf)
 
 void waitTimeStep()
 {
-		unsigned int t = micros();
+	/*	unsigned int t = micros();
 		while (micros() - t <= dt)
 		{
 				// Wait...
-		}
+		}*/
 }
 
 
@@ -462,10 +429,10 @@ void waitTimeStep()
 
 boolean engage()
 {
-		scanningEnabled = true;
+		/*scanningEnabled = true;
 		engaged = true;
 		pidEnabled = true;
-		return true;
+		return true;*/
 }
 
 
@@ -478,9 +445,9 @@ boolean engage()
 
 void retract()
 {
-		scanningEnabled = false;
+		/*scanningEnabled = false;
 		pidEnabled = false;
 		engaged = false;
 		z = MAX_Z; // Fully retract the Z-piezo
-		//digitalWrite(TUNNEL_LED, LOW);
+		//digitalWrite(TUNNEL_LED, LOW);*/
 }

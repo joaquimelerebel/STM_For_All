@@ -74,7 +74,7 @@ void serialCommand(String str)
         Serial.begin(115200);
         Serial.println("SE");
         serialEnabled = true;
-        digitalWriteFast(SERIAL_LED, HIGH);
+        //digitalWriteFast(SERIAL_LED, HIGH);
       }
       
       
@@ -83,13 +83,13 @@ void serialCommand(String str)
         serialEnabled = false;
         Serial.flush();
         Serial.end();
-        digitalWriteFast(SERIAL_LED, LOW);
+        //digitalWriteFast(SERIAL_LED, LOW);
       } 
       
       
       else if(command == "SS") // Scan size in LSBs
       {
-        boolean scanningEnabledOnCommand = scanningEnabled;
+        /*boolean scanningEnabledOnCommand = scanningEnabled;
         int new_scanSize = Serial.parseInt();
         int xNew, yNew;
         
@@ -109,92 +109,92 @@ void serialCommand(String str)
           moveTip(xNew, yNew);
           scanSize = new_scanSize;
         }
-        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scanning
+        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scanning*/
       }
       
       
       else if(command == "IP") // Image pixels
       {        
-        boolean scanningEnabledOnCommand = scanningEnabled;
+        /*boolean scanningEnabledOnCommand = scanningEnabled;
         pixelsPerLine = Serial.parseInt() * 2;
         resetScan();
-        if(scanningEnabledOnCommand) scanningEnabled = true;
+        if(scanningEnabledOnCommand) scanningEnabled = true;*/
       }
       
       
       else if(command == "LR") // Line rate in Hz
       {
-        boolean scanningEnabledOnCommand = scanningEnabled;
+        /*boolean scanningEnabledOnCommand = scanningEnabled;
         lineRate = (float)Serial.parseInt() / 100.0f; // Line rate is multiplied by 100 for the transmission
         while(pixelCounter != 0); // Wait for the scanner to finish scanning a line
         scanningEnabled = false; // Pause the scan
         updateStepSizes();
-        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scan
+        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scan*/
       }
      
       
       else if(command == "XO") // X-offset
       {
-        boolean scanningEnabledOnCommand = scanningEnabled;
+        /*boolean scanningEnabledOnCommand = scanningEnabled;
         int previous_xo = xo;
         int new_xo = Serial.parseInt();
         scanningEnabled = false; // Pause the scan
         xo = new_xo;
         moveTip(x - previous_xo + xo, y); // Move over by (xo, yo)
-        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scan
+        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scan*/
       } 
       
       
       else if(command == "YO") // Y-offset
       {
-        boolean scanningEnabledOnCommand = scanningEnabled;
+        /*boolean scanningEnabledOnCommand = scanningEnabled;
         int previous_yo = yo;
         int new_yo = Serial.parseInt();
         scanningEnabled = false;
         yo = new_yo;
         moveTip(x, y - previous_yo + yo);
-        if(scanningEnabledOnCommand) scanningEnabled = true;
+        if(scanningEnabledOnCommand) scanningEnabled = true;*/
       } 
       
       
       else if(command == "SP") // Setpoint in LSBs
       {
-        setpoint = Serial.parseInt();
-        setpointLog = logTable[abs(setpoint)];       
+        /*setpoint = Serial.parseInt();
+        setpointLog = logTable[abs(setpoint)];       */
       } 
       
       
       else if(command == "SB") // Sample bias in LSBs
       {
-        bias = Serial.parseInt();
+        /*bias = Serial.parseInt();
         noInterrupts();
         dac.setOutput((uint16_t)(bias + 32768), DAC_CH_BIAS); // Set the sample bias
-        interrupts();          
+        interrupts();          */
       }
       
       
       else if(command == "KP") // P gain
       {
-        Kp = Serial.parseInt();          
+//        Kp = Serial.parseInt();          
       } 
       
       
       else if(command == "KI") // I gain
       {
-        Ki = Serial.parseInt() * dt;        
+//        Ki = Serial.parseInt() * dt;        
       }
       
       
       else if(command == "EN") // Enable scanning
       {
         resetScan();
-        scanningEnabled = true; 
+//        scanningEnabled = true; 
       } 
       
       
       else if(command == "DL") // Disable scanning
       {
-        scanningEnabled = false;          
+//        scanningEnabled = false;          
       } 
       
       
