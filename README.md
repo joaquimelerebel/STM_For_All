@@ -59,7 +59,7 @@ Autofilled by the requirements.txt normally
 ## What is currently not working
 
 * exponential voltage output -> re-read some paper on the translation and review the equation given in the source paper(IBM)
-* JSON/stats output as a file
+* The numpy arrays output with the time seperator
 
 ## binary files used .bst files
 ****BIG ENDIAN****

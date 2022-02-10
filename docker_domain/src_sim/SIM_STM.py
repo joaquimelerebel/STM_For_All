@@ -40,6 +40,7 @@ def main():
             default=0, type=float, 
             metavar="ERROR", 
             help="maximum/standard error depending on the error model (default : 0)" );
+    
     parser.add_argument("-errtype", "--error_type",  
             type=str,
             metavar="ERROR_TYPE",
@@ -55,6 +56,18 @@ def main():
             default=False,
             help="scale the sim output exponentialy" );
 
+    
+    parser.add_argument("-vt", "--variation_time", 
+            dest="vtime",
+            default=0, type=float, 
+            metavar="VTIME", 
+            help="variation in time between each sample outputed to the file or CLI(default : 0) in ms" );
+    
+    parser.add_argument("-t", "--time", 
+            dest="time",
+            default=0, type=float, 
+            metavar="TIME", 
+            help="time between each sample outputed to the file or CLI(default : 0) in ms" );
 
     parser.add_argument("-stat", "--statisics",
                         default=False, action="store_true",
