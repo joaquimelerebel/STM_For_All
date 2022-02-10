@@ -101,7 +101,7 @@ class FileWriter:
     def setWidthHeight(self, height, width):
         self.height = height
         self.width = width
-        breakpoint()
+
         # ascii 
         if( not self.isBin ):
             out = ("[ " + str(height) + ", " + str(width) + " ]\n");
