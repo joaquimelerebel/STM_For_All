@@ -17,4 +17,4 @@ def save_image(filename, data, output_folder):
     # set the path and save the image in it
     path = output_folder + filename[:-4] + '.jpg'
     img.save(path, 'JPEG')
-    return path
+    return filename[:-4] + '.jpg'

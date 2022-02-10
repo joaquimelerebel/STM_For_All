@@ -7,7 +7,6 @@ from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
 
-
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
 OUTPUT_FOLDER = './static/img/results/'
@@ -75,18 +74,18 @@ def watch_file(file):
         path = binary_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         # render main and the image
-        return render_template("watchImage.html", imgpath=path)
+        return render_template("watchImage.html", path=path)
 
     elif (file.endswith(('.mst'))):
         path = file_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-        return render_template("watchImage.html", imgpath=path)
+        return render_template("watchImage.html", path=path)
     elif (file.endswith(('.bst'))):
         path = custom_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         if path == 0:
             return render_template("uploadFile.html")
-        return render_template("watchImage.html", imgpath=path)
+        return render_template("watchImage.html", path=path)
     else:
         print("Wrong parameters")
 

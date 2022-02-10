@@ -1,6 +1,7 @@
 html, body{
     height:100%;
     overflow:hidden;
+    font-family: 'Open Sans';
 }
 
 .lightgray{
@@ -44,6 +45,12 @@ html, body{
     margin-top: 1% !important
 }
 
+.fit{
+    padding:1%;
+    max-width: fit-content;
+    max-height: fit-content;
+    margin:auto;
+}
 .menu{
     padding: 1% !important;
     max-width: fit-content;
