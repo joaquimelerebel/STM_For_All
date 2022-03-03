@@ -32,6 +32,10 @@ def main():
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="print all the inner messages of the processing")
 
+    parser.add_argument("-s", "--size", required=True,
+                        dest="size", nargs="+", type=int, default=[0, 0],
+                        help="size of the image that is in the Teensy")
+    
     parser.add_argument("-o", "--save",
                         type=str,
                         metavar="filename", help="output filename")

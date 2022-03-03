@@ -37,8 +37,8 @@ commands used to control the microscope.
 
 void checkSerial()
 {
-  
-  String serialString;
+  char serialString[3];
+  bzero(serialString, 3);
   
   if(Serial.available() > 0)
   {
@@ -46,48 +46,42 @@ void checkSerial()
     {
       delay(1); // This seems to be necessary, not sure why
       char inChar = Serial.read();
-      serialString += inChar;
+      serialString[i] = inChar;
     }
   }
   serialCommand(serialString);
-  serialString = "";
 }
 
 /**************************************************************************/
 
-void serialCommand(String str)
+void serialCommand(char* command)
 {
+  //char command[3] = "\00\00\00";
+  char cache[16];
+  bzero(cache, 16);
   
-  String command = "00";
-  
-  if (str.length() > 0)
+  if (strlen(command) > 0)
   {     
-      // Get the first 2 characters of str and store them in command:
-      for(int i = 0; i < 2; i++)
-      {
-        command[i] = str[i];
-      }
-      
-      
-      if(command == "SE") // Enable serial communications
+
+      if( strncmp(command, "SE", 2) == 0) // Enable serial communications
       {
         Serial.begin(115200);
         Serial.println("SE");
         serialEnabled = true;
-        //digitalWriteFast(SERIAL_LED, HIGH);
+        digitalWriteFast(SERIAL_LED, HIGH);
       }
       
       
-      else if(command == "SD") // Disable serial communications
+      else if( strncmp(command, "SD", 2) == 0 ) // Disable serial communications
       {
         serialEnabled = false;
         Serial.flush();
         Serial.end();
-        //digitalWriteFast(SERIAL_LED, LOW);
+        digitalWriteFast(SERIAL_LED, LOW);
       } 
       
       
-      else if(command == "SS") // Scan size in LSBs
+      else if(!strcmp(command, "SS")) // Scan size in LSBs
       {
         /*boolean scanningEnabledOnCommand = scanningEnabled;
         int new_scanSize = Serial.parseInt();
@@ -113,7 +107,7 @@ void serialCommand(String str)
       }
       
       
-      else if(command == "IP") // Image pixels
+      else if(!strcmp(command, "IP")) // Image pixels
       {        
         /*boolean scanningEnabledOnCommand = scanningEnabled;
         pixelsPerLine = Serial.parseInt() * 2;
@@ -122,7 +116,7 @@ void serialCommand(String str)
       }
       
       
-      else if(command == "LR") // Line rate in Hz
+      else if(!strcmp(command, "LR")) // Line rate in Hz
       {
         /*boolean scanningEnabledOnCommand = scanningEnabled;
         lineRate = (float)Serial.parseInt() / 100.0f; // Line rate is multiplied by 100 for the transmission
@@ -133,7 +127,7 @@ void serialCommand(String str)
       }
      
       
-      else if(command == "XO") // X-offset
+      else if(!strcmp(command, "XO")) // X-offset
       {
         /*boolean scanningEnabledOnCommand = scanningEnabled;
         int previous_xo = xo;
@@ -145,7 +139,7 @@ void serialCommand(String str)
       } 
       
       
-      else if(command == "YO") // Y-offset
+      else if(!strcmp(command, "YO")) // Y-offset
       {
         /*boolean scanningEnabledOnCommand = scanningEnabled;
         int previous_yo = yo;
@@ -157,14 +151,14 @@ void serialCommand(String str)
       } 
       
       
-      else if(command == "SP") // Setpoint in LSBs
+      else if(!strcmp(command, "SP")) // Setpoint in LSBs
       {
         /*setpoint = Serial.parseInt();
         setpointLog = logTable[abs(setpoint)];       */
       } 
       
       
-      else if(command == "SB") // Sample bias in LSBs
+      else if(!strcmp(command, "SB")) // Sample bias in LSBs
       {
         /*bias = Serial.parseInt();
         noInterrupts();
@@ -173,38 +167,38 @@ void serialCommand(String str)
       }
       
       
-      else if(command == "KP") // P gain
+      else if(!strcmp(command, "KP")) // P gain
       {
-//        Kp = Serial.parseInt();          
+        Kp = Serial.parseInt();          
       } 
       
       
-      else if(command == "KI") // I gain
+      else if(!strcmp(command, "KI")) // I gain
       {
-//        Ki = Serial.parseInt() * dt;        
+        Ki = Serial.parseInt() * dt;        
       }
       
       
-      else if(command == "EN") // Enable scanning
+      else if(!strcmp(command, "EN")) // Enable scanning
       {
-        resetScan();
-//        scanningEnabled = true; 
+        //resetScan();
+        scanningEnabled = true; 
       } 
       
       
-      else if(command == "DL") // Disable scanning
+      else if(!strcmp(command, "DL")) // Disable scanning
       {
-//        scanningEnabled = false;          
+        scanningEnabled = false;          
       } 
       
       
-      else if(command == "TE") // Tip engage
+      else if(!strcmp(command, "TE")) // Tip engage
       {        
         engage();          
       } 
       
       
-      else if(command == "TR") // Tip retract
+      else if(!strcmp(command, "TR")) // Tip retract
       {        
         retract();          
       }

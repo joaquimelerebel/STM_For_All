@@ -2,7 +2,9 @@
 
 import serial as serialLib
 import cmd_int as cmd
-import time 
+import numpy as np
+import time
+import struct
 # inspiration of Dan Berard serial communication protocol 
 # used to communicate with a teesee through serial communication
 
@@ -96,15 +98,35 @@ class Serial_COM:
 
     def read_until_DATA(self, length=16386):
         stri = b""
+        #read until we get b"DATA"
         while True:
             stri += self.serial.read(4)
             cmd.print_verbose_WHITE(self.config, "[inDBG] " + str(stri) )
             if b"DATA" in stri:
                 break
             time.sleep(1)
-        # verify that stri is 
+        
         cmd.print_verbose_WHITE(self.config, "[in] --- reading DATA ----" )
-        stri = self.serial.read(length);
-        #inte = int(stri)
-        cmd.print_verbose_WHITE(self.config, "[in] DATA : " + str(inte))
-        return inte
+        #read the data
+        stri = stri[stri.find(b"DATA\r\n") + len(b"DATA\r\n"):]
+        stri += self.serial.read( length - len(stri) )
+
+     #   cmd.print_verbose_WHITE(self.config, "[in] DATA : " + str(stri))
+        return stri
+
+    def format_DATA(self, data, pixelPerLine):
+        eAvg = np.zeros(pixelPerLine, dtype=int);
+        zAvg = np.zeros(pixelPerLine, dtype=int);
+       
+        # everything is written in big endian
+        # put the line counter at the start of the line
+        lineCounter = struct.unpack(">h", data[0:2])
+        
+        for index in range(0, pixelPerLine) :
+            # reading from the byte 2, each number is 4 bytes long.
+            # thus the range must go from 2 to pixelPerLine*4 + 2.
+            # and jump 4 by 4 
+            zAvg[index] = struct.unpack(">I", data[(index*4) + 2 : (index*4) + 4 + 2 ])[0]
+            eAvg[index] = struct.unpack(">I", data[((index + pixelPerLine)*4) + 2 : ((index + pixelPerLine)*4) + 4 + 2 ])[0]
+
+        return (lineCounter, zAvg, eAvg)

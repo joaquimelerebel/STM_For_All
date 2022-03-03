@@ -1,5 +1,6 @@
 
 //#include "logTable.h"
+#include <SPIFIFO.h>
 #include "matrix.h"
 
 #define DATA_BUFFER_LENGTH 16386
@@ -20,8 +21,7 @@
 #define dt 40                              // Time step for scanning and PI control in microseconds
 #define DATA_BUFFER_LENGTH 16386           // Number of bytes in each ping-pong buffer for data storage. Need 2 bytes for line number + 16 bytes/pixel.
 #define SCAN_COUNTER_LIMIT 0x40000000      // Scan counter counts from -SCAN_COUNTER_LIMIT to SCAN_COUNTER_LIMIT-1
-
-
+#define SERIAL_LED 13
 
 // Sample, pixel and line counters:
 volatile unsigned int sampleCounter = 0, pixelCounter = 0, lineCounter = 0;
@@ -70,19 +70,29 @@ volatile int64_t iTerm = 0; // Integral term
 int sigmaX = 0, sigmaY = 0, sigmaZ = 0; // Sigma-delta integrators
 //const unsigned int shift = POSITION_BITS - DAC_BITS; // Number of bits to increase DAC resolution by using sigma-delta algorithm
 
-hw_timer_t * timer = NULL;
-portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-
-void IRAM_ATTR incrementScan(void); 
+IntervalTimer scanTimer;
+//portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 
 void setup()
 {
 		// Start the scan/PI/sigma-delta timer:
-		timer = timerBegin(0, 10, true);		
+		/*timer = timerBegin(0, 10, true);		
 		timerAttachInterrupt(timer, &incrementScan, true);
 		timerAlarmWrite(timer, 100000, true);
-		timerAlarmEnable(timer);
+		timerAlarmEnable(timer);*/
+
+  // setup for a simulation
+    xCount = 0;
+    yCount = 0;
+    dx=1;
+    dy=1;
+    pixelsPerLine = final_width;
+    
+    pinMode(SERIAL_LED, OUTPUT);
+    
+    scanTimer.priority(0);
+    scanTimer.begin(incrementScan, dt);
 	}
 
 
@@ -99,31 +109,31 @@ void loop()
 		// Send data over USB if a line has been scanned and re-scanned:
 		if(sendData)
 		{    
-				//if(!fillData1) // Print data1
+				if(!fillData1) // Print data1
 				{
 						data1[0] = (byte)((lineCounter >> 8) & 0xFF); // High byte
 						data1[1] = (byte)(lineCounter & 0xFF); // Low byte
-
+            /*
 						if(serialEnabled)
 						{
 								Serial.println("DATA");
 								Serial.write(data1, DATA_BUFFER_LENGTH);
-						}
+						}*/
 
 						// Uncomment this block to print human-readable data to the serial port:
-						/*
+						
 						   for(unsigned int i = 0; i < pixelsPerLine * 2; i++) // Loop over pixels
 						   {
-						   Serial.print((int)((int)data1[4*i+2] << 24 | (int)data1[4*i+3] << 16 |(int)data1[4*i+4] << 8 |(int)data1[4*i+5]));
-						   Serial.print(" ");
+  						   Serial.print((int)((int)data1[4*i+2] << 24 | (int)data1[4*i+3] << 16 |(int)data1[4*i+4] << 8 |(int)data1[4*i+5]));
+  						   Serial.print(" ");
 						   }
-						 */
+						
 				}
-				/*else
+				else
 				{
 						data2[0] = (byte)((lineCounter >> 8) & 0xFF); // High byte
 						data2[1] = (byte)(lineCounter & 0xFF); // Low byte
-
+            /*
 						if(serialEnabled)
 						{
 								Serial.println("DATA");
@@ -131,14 +141,14 @@ void loop()
 						}*/
 
 						// Uncomment this block to print human-readable data to the serial port:
-						/*
+						
 						   for(unsigned int i = 0; i < pixelsPerLine * 2; i++) // Loop over pixels
 						   {
-						   Serial.print((int)((int)data2[4*i+2] << 24 | (int)data2[4*i+3] << 16 |(int)data2[4*i+4] << 8 |(int)data2[4*i+5]));
-						   Serial.print(" ");
+						      Serial.print((int)((int)data2[4*i+2] << 24 | (int)data2[4*i+3] << 16 |(int)data2[4*i+4] << 8 |(int)data2[4*i+5]));
+                  Serial.print(" ");
 						   }
-						 */     
-				//}
+						 
+				}
 				Serial.println();
 
 				sendData = false;
@@ -153,30 +163,13 @@ void loop()
  */
 /**************************************************************************/
 
-void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
+void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
 {  
+    noInterrupts();
 		static int xout, yout, zout;
 		static int64_t pTerm;
     int table_index;
-    
-		portENTER_CRITICAL_ISR(&timerMux);
-		//interruptCounter++;
-		portEXIT_CRITICAL_ISR(&timerMux);
-	
-		//////////////////////////////////////////////////////////////////////
-		// Increment the scan:
-		//////////////////////////////////////////////////////////////////////
-
-		if(scanningEnabled)
-		{
-				if(xCount <= 0 || xCount >= final_width - 1 - dx) dx = -dx; // Reverse at the end of a line
-				xCount += dx;
-				x = (int)(((int64_t)xCount * (int64_t)scanSize) >> 31) + xo;
-				if(yCount <= 0 || yCount >= final_height - 1 - dy) dy = -dy; // Reverse and the end of a scan
-				yCount += dy;
-				y = (int)(((int64_t)yCount * (int64_t)scanSize) >> 31) + yo;
-				if(yCount <= 0) lineCounter = 0; // Just in case the scan and acquisition become desynchronized...
-		}
+    char cache[128];
 
 		//////////////////////////////////////////////////////////////////////
 		// Perform PI calculations:
@@ -185,9 +178,13 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 		//adc.begin(); // Set up the SPI port to communicate with the ADC
 		//input = adc.read(); // Read the ADC data over SPI
 		// SIMULATION 
+
     
-		input = table[ (yCount*final_width) + xCount*final_width ]; 
-   
+    
+		input = table[ yCount*final_width + xCount ]; 
+    //sprintf(cache, "[DEB] %d, %d, %d, %d, %d", yCount, xCount, final_width, final_height, input);
+    //Serial.println(cache);
+    
 	 // if(saturationCompensation & (input == 0) & (z != -MAX_Z)) input = 32767; // Compensate for the LTC2326-16 saturation issue
 		//error = logTable[abs((int16_t)input)] - setpointLog; // Negative error = tip too far from sample
 
@@ -229,12 +226,17 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 				zAvg += z; // Accumulate data for averaging
 				eAvg += error;
 				sampleCounter++;
-
+        
 				if(sampleCounter >= samplesPerPixel) // If enough samples have been acquired for one pixel
 				{
+            //sprintf(cache, "[DEB] y:%d, x:%d, zAvg:%x, c:%d, z:%d, dx:%d, dy:%d", yCount, xCount, zAvg, sampleCounter, z, dx, dy);
+            //Serial.println(cache);
+    
 						unsigned int indexZ = (pixelCounter << 2) + 2; // Index for Z data point in data buffer
 						unsigned int indexE = indexZ + (pixelsPerLine << 2);  // Index for error data point in data buffer
 
+            //Serial.println(indexZ);
+            
 						zAvg = zAvg / (int)samplesPerPixel; // Compute the average of acquired samples
 						eAvg = eAvg / (int)samplesPerPixel;
 
@@ -278,6 +280,29 @@ void IRAM_ATTR incrementScan(void) // This interrupt runs in about ~18 us at 96 
 						}
 				}
 		}
+
+    //////////////////////////////////////////////////////////////////////
+    // Increment the scan:
+    //////////////////////////////////////////////////////////////////////
+
+    if(scanningEnabled)
+    {
+        if(xCount < 0 || xCount > final_width - dx)
+        {
+          dx = -dx; // Reverse at the end of a line
+          if(yCount < 0 || yCount > final_height - dy) dy = -dy; // Reverse and the end of a scan
+          yCount += dy;
+        }
+        xCount += dx;
+       
+        x = (int)(((int64_t)xCount * (int64_t)scanSize) >> 31) + xo;
+        //if(yCount <= 0 || yCount >= final_height/2 - 1 - dy) dy = -dy; // Reverse and the end of a scan
+        //yCount += dy;
+        y = (int)(((int64_t)yCount * (int64_t)scanSize) >> 31) + yo;
+        if(yCount <= 0) lineCounter = 0; // Just in case the scan and acquisition become desynchronized...
+    }
+   
+    interrupts();
    
 }
 
@@ -326,16 +351,16 @@ int saturate(int val, int max, int min)
 void updateStepSizes()
 {
 		unsigned int new_samplesPerPixel = (unsigned int)(1000000.0f / (lineRate * (float)dt * (float)pixelsPerLine));
-		int new_dx = (SCAN_COUNTER_LIMIT - 1)/ ((int)new_samplesPerPixel * (int)pixelsPerLine) * 4;
-		int new_dy = new_dx / (int)pixelsPerLine;
+		int new_dx = 1;
+		int new_dy = 1;
 
-		portDISABLE_INTERRUPTS();
+		noInterrupts();
 		samplesPerPixel = new_samplesPerPixel;
 		if(dx > 0) dx = new_dx;
 		else dx = -new_dx;
 		if(dy > 0) dy = new_dy;
 		else dy = -new_dy;
-		portENABLE_INTERRUPTS();
+		interrupts();
 }
 
 
@@ -347,17 +372,17 @@ void updateStepSizes()
 
 void resetScan()
 {
-		/*int xStart = -(scanSize >> 1) + xo;
-		int yStart = -(scanSize >> 1) + yo;
+		int xStart = 0;
+		int yStart = 0;
 
 		scanningEnabled = false; // disable scanning
 
 		// Reset counters etc:
 		noInterrupts();
-		xCount = -SCAN_COUNTER_LIMIT;
-		yCount = -SCAN_COUNTER_LIMIT;
-		dx = 0;
-		dy = 0;
+		xCount = 1;
+		yCount = 1;
+		dx = 1;
+		dy = 1;
 		updateStepSizes(); // Re-calculate step sizes
 		sampleCounter = 0;
 		pixelCounter = 0;
@@ -368,7 +393,7 @@ void resetScan()
 		interrupts();
 
 		// Move to start position:
-		moveTip(xStart, yStart);*/
+		moveTip(xStart, yStart);
 }
 
 
@@ -431,8 +456,8 @@ boolean engage()
 {
 		/*scanningEnabled = true;
 		engaged = true;
-		pidEnabled = true;
-		return true;*/
+		pidEnabled = true;*/
+		return true;
 }
 
 
