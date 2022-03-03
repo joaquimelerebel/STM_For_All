@@ -9,6 +9,7 @@ from json import dumps
 
 import config as conf
 import filewriter as fwc
+import serialwriter as swc
 
 VERSION = 0
 PATCH = 1
@@ -18,7 +19,11 @@ def sim_image(config: conf.Config):
     image = Image.open(config.simulation_filename).convert('L')
     width, height = image.size
     data = asarray(image)
-    fw = fwc.FileWriter(config)
+
+    if( not config.isSerial ) :
+        fw = fwc.FileWriter(config);
+    else :
+        fw = swc.SerialWriter(config);
     fw.setWidthHeight(height, width)
 
     # allocation of the output array of voltages
@@ -69,9 +74,9 @@ def sim_image(config: conf.Config):
 
             # printing result
             if(w == width-1):
-                tpoints[h, w] = fw.writePoint(data_voltage, True)
+                tpoints[h, w] = fw.writePoint(h, w, data_voltage, True)
             else:
-                tpoints[h,w] = fw.writePoint(data_voltage, False)
+                tpoints[h,w] = fw.writePoint(h, w, data_voltage, False)
 
 
     fw.writeAll(data_voltages)
