@@ -62,7 +62,7 @@ def upload_file():
                   str(ALLOWED_EXTENSIONS).strip('[]'))
             return redirect(request.url)
 
-    return render_template("uploadFile.html", format=app.config['ALLOWED_EXTENSIONS'])
+    return render_template("/functionnalities/uploadFile.html", format=app.config['ALLOWED_EXTENSIONS'])
 
 
 @app.route("/image/watch/<file>", methods=['GET', 'POST'])
@@ -71,21 +71,19 @@ def watch_file(file):
         return redirect(request.url)
 
     if (file.endswith((".npy"))):
-        path = binary_read(
+        path, size, mode, format, palette = binary_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
         # render main and the image
-        return render_template("watchImage.html", path=path)
+        return render_template("/functionnalities/watchImage.html", path=path, size=size, mode=mode, format=format, palette=palette)
 
     elif (file.endswith(('.mst'))):
-        path = file_read(
+        path, size, mode, format, palette = file_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-        return render_template("watchImage.html", path=path)
+        return render_template("/functionnalities/watchImage.html", path=path, size=size, mode=mode, format=format, palette=palette)
     elif (file.endswith(('.bst'))):
-        path = custom_read(
+        path, size, mode, format, palette = custom_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-        if path == 0:
-            return render_template("uploadFile.html")
-        return render_template("watchImage.html", path=path)
+        return render_template("/functionnalities/watchImage.html", path=path, size=size, mode=mode, format=format, palette=palette)
     else:
         print("Wrong parameters")
 

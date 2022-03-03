@@ -53,17 +53,15 @@
         {% with messages = get_flashed_messages() %}
           {% if messages %}
 
-      <div class='alert-fixed'>
-            {% for message in messages %}
+          {% for message in messages %}
             <div class="alert alert-danger align-items-center d-flex alert-dismissible fade show" role="alert">
               <ion-icon name="warning"></ion-icon>
               <strong>Warning: </strong> {{message}}
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            {% endfor %}
-          {% endif %}
 
-      </div>
+      {% endfor %}
+      {% endif %}
         {% endwith %}
         {% block body %}{% endblock %}
     <!-- End -->

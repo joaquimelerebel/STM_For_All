@@ -1,0 +1,28 @@
+{% set titles = {"Image processing" : ["Interpolation", "Colorization",
+"Method"], "Format": ["File format", "Zoom"]} %}
+
+<p class="maxitext">Toolkit</p>
+<div class="blackbox">
+  {% for title in titles %}
+  <p class="mediumtext">{{title}}</p>
+  {% for subtitle in titles[title] %}
+  <div class="ddmenu">
+    <a
+      data-bs-toggle="collapse"
+      href="#{{''.join(subtitle.split()).lower()}}"
+      role="button"
+      aria-expanded="false"
+    >
+      <ion-icon style="fill: white" name="caret-forward-outline"></ion-icon>
+    </a>
+    <p class="menutext">{{subtitle}}</p>
+  </div>
+  <div class="collapse" id="{{''.join(subtitle.split()).lower()}}">
+    {% include "imagetoolkit/" + ''.join(subtitle.split()).lower()+ '.html' %}
+  </div>
+  {% endfor %} {% endfor %}
+
+  <div style="text-align: center; margin-bottom: 5%">
+    <button type="button" class="btn btn-primary">Export</button>
+  </div>
+</div>
