@@ -17,24 +17,41 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
+deviceTypes = {
+    "Scan size": 0,
+    "Width": 0,
+    "Line rate": 0,
+    "Offset": {"x": 0, "y": 0},
+    "Set point": 0,
+    "Sample bias": 0,
+    "PID": {"KP": 0, "KI": 0, "KD": 0}
+}
+
+imageTitles = {
+    "Image processing": ["Interpolation", "Colorization", "Method"],
+    "Format": ["File format", "Zoom"]}
+
+deviceTitles = {
+    "Video processing": ["Interpolation", "Colorization", "Method"],
+    "Control": ["Values"],
+    "Format": ["Screenshot"]}
+
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower(
-           ) in app.config['ALLOWED_EXTENSIONS']
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
-@app.route("/")
+@ app.route("/")
 def main_menu():
     return render_template("mainMenu.html",)
 
 
-@app.route("/image")
+@ app.route("/image")
 def image_menu():
     return render_template("imageMenu.html",)
 
 
-@app.route("/image/upload", methods=['GET', 'POST'])
+@ app.route("/image/upload", methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -65,7 +82,7 @@ def upload_file():
     return render_template("/functionnalities/uploadFile.html", format=app.config['ALLOWED_EXTENSIONS'])
 
 
-@app.route("/image/watch/<file>", methods=['GET', 'POST'])
+@ app.route("/image/watch/<file>", methods=['GET', 'POST'])
 def watch_file(file):
     if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
         return redirect(request.url)
@@ -73,19 +90,30 @@ def watch_file(file):
     if (file.endswith((".npy"))):
         path, size, mode, format, palette = binary_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-        # render main and the image
-        return render_template("/functionnalities/watchImage.html", path=path, size=size, mode=mode, format=format, palette=palette)
-
     elif (file.endswith(('.mst'))):
         path, size, mode, format, palette = file_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-        return render_template("/functionnalities/watchImage.html", path=path, size=size, mode=mode, format=format, palette=palette)
     elif (file.endswith(('.bst'))):
         path, size, mode, format, palette = custom_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-        return render_template("/functionnalities/watchImage.html", path=path, size=size, mode=mode, format=format, palette=palette)
-    else:
-        print("Wrong parameters")
+    return render_template("/functionnalities/watchImage.html",
+                           path=path,
+                           size=size,
+                           mode=mode,
+                           format=format,
+                           palette=palette,
+                           titles=imageTitles,
+                           toolkit="imagetoolkit")
+
+
+@ app.route("/device")
+def device_menu():
+    return render_template("deviceMenu.html",)
+
+
+@ app.route("/device/connect")
+def connect_link():
+    return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
 if __name__ == "__main__":

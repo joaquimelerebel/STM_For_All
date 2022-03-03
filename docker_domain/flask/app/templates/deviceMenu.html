@@ -1,0 +1,19 @@
+{% extends "menuTemplate.html" %} {% block mainpage %}
+<div class="coldisp">
+  <h2 class="title">Device</h2>
+  <p style="margin-left: 4%">
+    For now, not much can be done. The project is still a Work-In-Progress.
+  </p>
+  <p style="text-align: center">
+    Please plug the device to a usb port
+  </p>
+  <div class="greybox">No link detected</div>
+  <div style= 'text-align: center; margin-top: 1%;'>
+    <a href={{ url_for('connect_link') }}>
+        <button type="button" class="btn btn-primary">
+          Connect
+        </button>
+    </a>
+  </div>
+</div>
+{% endblock %}

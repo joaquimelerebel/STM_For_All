@@ -1,6 +1,3 @@
-{% set titles = {"Image processing" : ["Interpolation", "Colorization",
-"Method"], "Format": ["File format", "Zoom"]} %}
-
 <p class="maxitext">Toolkit</p>
 <div class="blackbox">
   {% for title in titles %}
@@ -12,13 +9,18 @@
       href="#{{''.join(subtitle.split()).lower()}}"
       role="button"
       aria-expanded="false"
+      onClick="rotateImage('{{''.join(subtitle.split()).lower()}}arrow');"
     >
-      <ion-icon style="fill: white" name="caret-forward-outline"></ion-icon>
+      <ion-icon
+        class="icon"
+        id="{{''.join(subtitle.split()).lower()}}arrow"
+        name="caret-forward-outline"
+      />
     </a>
     <p class="menutext">{{subtitle}}</p>
   </div>
   <div class="collapse" id="{{''.join(subtitle.split()).lower()}}">
-    {% include "imagetoolkit/" + ''.join(subtitle.split()).lower()+ '.html' %}
+    {% include toolkit + "/" + ''.join(subtitle.split()).lower()+ '.html' %}
   </div>
   {% endfor %} {% endfor %}
 

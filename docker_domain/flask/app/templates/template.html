@@ -28,6 +28,9 @@
   <body class="dark text-white">
 
       <!-- Header -->
+
+      {% set breadcrumbs = url_for(request.endpoint, **request.view_args)[1:].split("/") %}
+
       <nav class="navbar navbar-expand-lg sticky-top navbar-dark gray">
         <div class="container-fluid">
           <a class="navbar-brand" href={{ url_for('main_menu') }}>
@@ -37,14 +40,27 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-              <a class="nav-link" href={{ url_for('image_menu') }}>Image</a>
-              <a class="nav-link"  href="#">Device</a>
-              <a class="nav-link"  href="#">Log</a>
+            <div class="navbar-nav ">
+              {% if breadcrumbs[0]=="image" %}
+                <a class="nav-link active" href={{ url_for('image_menu') }}>Image</a>
+              {% else %}
+                <a class="nav-link" href={{ url_for('image_menu') }}>Image</a>
+              {% endif %}
+              {% if breadcrumbs[0]=="device" %}
+                <a class="nav-link active" href={{ url_for('device_menu') }}>Device</a>
+              {% else %}
+                <a class="nav-link"  href={{ url_for('device_menu') }}>Device</a>
+              {% endif %}
+              {% if breadcrumbs[0]=="log" %}
+                <a class="nav-link active"  href="#">Log</a>
+              {% else %}
+                <a class="nav-link"  href="#">Log</a>
+              {% endif %}
             </div>
           </div>
         </div>
       </nav>
+
       <!-- Variable block  -->
 
       {% block content %}{% endblock %}
@@ -68,7 +84,25 @@
 
     <!-- JQUERY -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
 
+    var dict = {}
+    $('.icon').each(function(index, elem) {
+      dict[elem.id]=false 
+    });
+  
+  function rotateImage(id) {
+    !dict[id] ? dict[id] =true : dict[id] =false
+    !dict[id]  ? $('#' + id).css({
+      "transform": 'rotate(0deg)' 
+    })
+    : $('#' + id).css({
+      "transform": 'rotate(90deg)' 
+    })
+}
+</script>
+
+</script>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

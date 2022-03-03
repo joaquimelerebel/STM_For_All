@@ -1,10 +1,7 @@
 {% extends "./menuToolkitTemplate.html" %} {% block mainpage %}
 
 <div class="coldisp">
-  <h2 class="title">Image output</h2>
-  <span style="color: grey; margin-top: 0.5%; margin-left: 3%">
-    {{ url_for('static', filename='img/results/'+path) }}
-  </span>
+  <h2 class="title">Flow output</h2>
   <div class="container">
     <div style="margin-top: 2% !important; margin: auto; text-align: center">
       {% if path%}
@@ -17,8 +14,7 @@
         />
       </div>
       {% else %}
-
-      <h4>No image</h4>
+      <h4>No flow</h4>
 
       {% endif %}
     </div>
