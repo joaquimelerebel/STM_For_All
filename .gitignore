@@ -140,3 +140,6 @@ docker_domain/src_sim/output~feat-resulting_image
 
 # Output files
 output
+
+#vim files 
+*.swp

@@ -181,7 +181,7 @@ void serialCommand(char* command)
       
       else if(!strcmp(command, "EN")) // Enable scanning
       {
-        //resetScan();
+        resetScan();
         scanningEnabled = true; 
       } 
       

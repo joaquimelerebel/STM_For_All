@@ -113,41 +113,41 @@ void loop()
 				{
 						data1[0] = (byte)((lineCounter >> 8) & 0xFF); // High byte
 						data1[1] = (byte)(lineCounter & 0xFF); // Low byte
-            /*
+            
 						if(serialEnabled)
 						{
 								Serial.println("DATA");
 								Serial.write(data1, DATA_BUFFER_LENGTH);
-						}*/
+						}
 
 						// Uncomment this block to print human-readable data to the serial port:
-						
+						/*
 						   for(unsigned int i = 0; i < pixelsPerLine * 2; i++) // Loop over pixels
 						   {
   						   Serial.print((int)((int)data1[4*i+2] << 24 | (int)data1[4*i+3] << 16 |(int)data1[4*i+4] << 8 |(int)data1[4*i+5]));
   						   Serial.print(" ");
 						   }
-						
+						*/
 				}
 				else
 				{
 						data2[0] = (byte)((lineCounter >> 8) & 0xFF); // High byte
 						data2[1] = (byte)(lineCounter & 0xFF); // Low byte
-            /*
+            
 						if(serialEnabled)
 						{
 								Serial.println("DATA");
 								Serial.write(data2, DATA_BUFFER_LENGTH);
-						}*/
+						}
 
 						// Uncomment this block to print human-readable data to the serial port:
-						
+						/*
 						   for(unsigned int i = 0; i < pixelsPerLine * 2; i++) // Loop over pixels
 						   {
 						      Serial.print((int)((int)data2[4*i+2] << 24 | (int)data2[4*i+3] << 16 |(int)data2[4*i+4] << 8 |(int)data2[4*i+5]));
                   Serial.print(" ");
 						   }
-						 
+						 */
 				}
 				Serial.println();
 
@@ -170,6 +170,7 @@ void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
 		static int64_t pTerm;
     int table_index;
     char cache[128];
+    
 
 		//////////////////////////////////////////////////////////////////////
 		// Perform PI calculations:
@@ -182,6 +183,7 @@ void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
     
     
 		input = table[ yCount*final_width + xCount ]; 
+    
     //sprintf(cache, "[DEB] %d, %d, %d, %d, %d", yCount, xCount, final_width, final_height, input);
     //Serial.println(cache);
     
@@ -221,6 +223,7 @@ void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
 		//////////////////////////////////////////////////////////////////////
     
     int z = input;
+    bool isTimeToChangePos = false;
 		if(scanningEnabled)
 		{
 				zAvg += z; // Accumulate data for averaging
@@ -229,16 +232,18 @@ void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
         
 				if(sampleCounter >= samplesPerPixel) // If enough samples have been acquired for one pixel
 				{
-            //sprintf(cache, "[DEB] y:%d, x:%d, zAvg:%x, c:%d, z:%d, dx:%d, dy:%d", yCount, xCount, zAvg, sampleCounter, z, dx, dy);
+            isTimeToChangePos = true;
+            //sprintf(cache, "[DEB-1] y:%d, x:%d, zAvg:%x, c:%d, z:%x, dx:%d, dy:%d, s:%d", yCount, xCount, zAvg, sampleCounter, z, dx, dy, samplesPerPixel);
             //Serial.println(cache);
     
 						unsigned int indexZ = (pixelCounter << 2) + 2; // Index for Z data point in data buffer
 						unsigned int indexE = indexZ + (pixelsPerLine << 2);  // Index for error data point in data buffer
-
-            //Serial.println(indexZ);
             
 						zAvg = zAvg / (int)samplesPerPixel; // Compute the average of acquired samples
 						eAvg = eAvg / (int)samplesPerPixel;
+
+            //sprintf(cache, "[DEB] y:%d, x:%d, zAvg:%x, c:%d, z:%x, dx:%d, dy:%d", yCount, xCount, zAvg, sampleCounter, z, dx, dy);
+            //Serial.println(cache);
 
 						if(fillData1)
 						{
@@ -262,6 +267,8 @@ void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
 								data2[indexE + 2] = (byte)((eAvg >> 8) & 0xFF);
 								data2[indexE + 3] = (byte)(eAvg & 0xFF);         // Low byte E
 						}
+            
+            
 						pixelCounter++;      
 						sampleCounter = 0;
 						zAvg = 0;
@@ -284,8 +291,7 @@ void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
     //////////////////////////////////////////////////////////////////////
     // Increment the scan:
     //////////////////////////////////////////////////////////////////////
-
-    if(scanningEnabled)
+    if(scanningEnabled && isTimeToChangePos )
     {
         if(xCount < 0 || xCount > final_width - dx)
         {
@@ -350,7 +356,7 @@ int saturate(int val, int max, int min)
 
 void updateStepSizes()
 {
-		unsigned int new_samplesPerPixel = (unsigned int)(1000000.0f / (lineRate * (float)dt * (float)pixelsPerLine));
+		unsigned int new_samplesPerPixel = (unsigned int)(1000000.0f / ((float)lineRate * (float)dt * (float)pixelsPerLine));
 		int new_dx = 1;
 		int new_dy = 1;
 
@@ -379,16 +385,16 @@ void resetScan()
 
 		// Reset counters etc:
 		noInterrupts();
-		xCount = 1;
-		yCount = 1;
-		dx = 1;
-		dy = 1;
 		updateStepSizes(); // Re-calculate step sizes
 		sampleCounter = 0;
 		pixelCounter = 0;
 		lineCounter = 0;
 		zAvg = 0;
 		eAvg = 0;
+    xCount = 0;
+    yCount = 0;
+    dx = 1;
+    dy = 1;
 		fillData1 = true;
 		interrupts();
 

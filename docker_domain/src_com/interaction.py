@@ -13,4 +13,5 @@ def simpleInteraction( config ):
     com_ser.disable_scanning();
     com_ser.serial_disable();
     line, zAvg, eAvg = com_ser.format_DATA(s, config.width)
-    print(zAvg)
+    for n in zAvg :
+        print(hex(n))
