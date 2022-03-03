@@ -4,32 +4,27 @@ import serial as serialLib
 import subprocess
 import cmd_int as cmd
 
-
-class Serial_COM:
+class Serial_COM :
     def __init__(self, config):
         self.config = config
         # DEBUG verify the output of the shell command
-        subp = subprocess.Popen("ls /dev/tty* | grep usb",
-                                shell=True, stdout=subprocess.PIPE)
-        subprocess_return = subp.stdout.read()
-
         cmd.print_verbose_WHITE(config, "[process] Looking for device")
-
         try:
-            self.serial = serialLib.Serial(subprocess_return, 115200)
+            self.serial = serialLib.Serial(config.device, 115200)
+            cmd.print_GREEN(f"using : {config.device}" )
         except Exception as e:
             cmd.eprint_RED("software did not recognise the serial connection")
             exit()
 
-        cmd.print_GREEN("using : %s" % serial.name)
+
 
     def serial_init(self):
-        cmd.print_verbose_WHITE(config, "[out] SERIAL ENABLED")
-        self.serial.write("SE")
+        cmd.print_verbose_WHITE(self.config, "[out] SERIAL ENABLED")
+        self.serial.write(b"SE")
 
     def serial_disable(self):
-        cmd.print_verbose_WHITE(config, "[out] SERIAL DISABLED")
-        self.serial.write("SD")
+        cmd.print_verbose_WHITE(self.config, "[out] SERIAL DISABLED")
+        self.serial.write(b"SD")
 
     # Scan size in LSBs
     def scan_size(self, scan_size):
@@ -40,7 +35,7 @@ class Serial_COM:
     def img_pixel(self, image_pix):
         cmd.print_verbose_WHITE(
             config, "[out] IMAGE-PIXEL : " + str(image_pix))
-        self.serial.write("IP" + image_pix)
+        self.serial.write(b"IP" + image_pix)
 
     # Line rate in Hz
     def line_rate(self, freq):
@@ -90,7 +85,19 @@ class Serial_COM:
         cmd.print_verbose_WHITE(config, "[out] RETRACT TIP")
         self.serial.write("TR")
 
-    def read_until_DATA(self):
+    def read_until_code(self):
+        stri = "";
+        cmd=["SE"];
+        while True:
+            stri = str(self.serial.read(2))
+            if stri in cmd :
+                break
+            time.sleep(1)
+        # verify that stri is byte
+        inte = int(stri)
+        cmd.print_verbose_WHITE(config, "[in] DATA : " + str(inte))
+
+    def read_until_DATA(self, length=16386):
         stri = ""
         while True:
             stri = str(self.serial.read(4))
@@ -98,7 +105,7 @@ class Serial_COM:
                 break
             time.sleep(1)
         # verify that stri is byte
-        stri = self.serial.read(2)
+        stri = self.serial.read(length)
         inte = int(stri)
         cmd.print_verbose_WHITE(config, "[in] DATA : " + str(inte))
         return inte

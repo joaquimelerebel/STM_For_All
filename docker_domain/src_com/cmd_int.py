@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import time
 
 
 #print in stderr in red
@@ -32,8 +33,8 @@ def print_GREEN(*args, **kwargs):
     sys.stdout.write(u"\u001b[0m")
 
 #print in stdout in green
-
-
 def print_verbose_WHITE(config, *args, **kwargs):
+    if(config.ts) : 
+        sys.stdout.write( f"[{time.time()}] " )
     if(config.verbose):
         print(*args, **kwargs)
