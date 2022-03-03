@@ -60,7 +60,7 @@ volatile int x = 0, y = 0, z = 0; // Scanner coordinates in LSBs
 boolean pidEnabled = true; // Setting this to false desiables PI control
 int setpoint = SETPOINT, setpointLog; // setpointLog = log(|setpoint|)
 int Kp = KP, Ki = KI; // Proportional and integral gains
-volatile int16_t input; // ADC input data
+volatile uint16_t input; // ADC input data
 volatile int error = 0; // PID error signal
 volatile int64_t iTerm = 0; // Integral term
 //const int64_t MAX_ITERM = MAX_Z * 0x100000000; // Maximum integral term. Used to prevent windup.
@@ -222,7 +222,7 @@ void incrementScan(void) // This interrupt runs in about ~18 us at 96 MHz
 		// Store data in buffer arrays and update counters:
 		//////////////////////////////////////////////////////////////////////
     
-    int z = input;
+    unsigned int z = input;
     bool isTimeToChangePos = false;
 		if(scanningEnabled)
 		{
