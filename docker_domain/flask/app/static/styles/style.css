@@ -120,10 +120,10 @@ input[readonly]:hover {
 
 .blackbox{
     background-color: #1E1E1E;
-    max-height: fit-content;
     overflow-wrap: break-word;
     margin-bottom:5%;
     overflow: auto;
+    padding: 5%;
 }
 
 .greybox{
