@@ -7,7 +7,7 @@ from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
 from functions.com.listDevice import get_device_list
-import DAO.ConfigClassi
+import DAO.ConfigClass as ConfigClass
 
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
@@ -19,7 +19,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
-config=Config(logFilePath="logs/" +  datetime.now().strftime("%d:%m:%Y__%H:%M:%S"))
+config=ConfigClass.Config(logFilePath="logs/" +  datetime.now().strftime("%d:%m:%Y__%H:%M:%S"))
 
 
 deviceTypes = {
