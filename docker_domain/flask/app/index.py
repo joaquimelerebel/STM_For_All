@@ -1,6 +1,6 @@
 import json
-from functions.save import to_JSON
-from flask import Flask, flash, render_template, request, redirect, session, url_for
+from functions.save import to_JSON as convertJSON
+from flask import Flask, Response, flash, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
 import os
 from functions.readings.bin_read import binary_read
@@ -33,7 +33,6 @@ deviceTypes = {
         "KD": 0
     }
 }
-
 
 imageTitles = {
     "Image processing": ["Interpolation", "Colorization", "Method"],
@@ -140,7 +139,6 @@ def watch_device():
         else:
             flash('Wrong extension. Allowed extensions : .json, .JSON', 'error')
             return redirect(request.url)
-
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
@@ -150,11 +148,23 @@ def watch_device():
 @ app.route("/device/config/save", methods=['GET', 'POST'])
 def save_config():
     if request.method == 'POST':
-        flash(request.form, "success")
-        if not session.get("import") is None:
-            imported = json.loads(session.get("import"))
-            return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
-    return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+        req = request.form
+        convert = convertJSON.to_JSON()
+        convert.set_all(req.get('scan_size'), req.get('img_pixel'),
+                        req.get('line_rate'), req.get('x'), req.get('y'),
+                        req.get('set_point'), req.get('sample_bias'),
+                        req.get('KP'), req.get('KI'), req.get('KD'))
+        jsonfile = convert.json_output()
+        if 'export' in request.form:
+            return Response(jsonfile,
+                            mimetype='application/json',
+                            headers={'Content-Disposition': 'attachment; filename=blabla.json'})
+        elif 'set' in request.form:
+            session["import"] = jsonfile
+            flash("The config was successfully set", "success")
+            return redirect(url_for('watch_device'))
+    flash("The file wasn't exported", "error")
+    return redirect(url_for('watch_device'))
 
 
 if __name__ == "__main__":
