@@ -1,9 +1,4 @@
-<form
-  method="post"
-  class="col needs-validation"
-  novalidate
-  action="{{url_for('save_config')}}"
->
+<form method="post" action="{{url_for('save_config')}}">
   {% if imported %} {% set types = imported%} {%endif%} {% for type in types%}
   {%if types[type] is mapping%}
   <p class="menutext">{{type}}</p>
@@ -54,13 +49,7 @@
     </div>
 
     <div class="mx-2" style="margin-bottom: 5%">
-      <button
-        type="button"
-        class="btn btn-primary"
-        onClick="this.form.submit()"
-      >
-        Export
-      </button>
+      <button type="submit" class="btn btn-primary">Export</button>
     </div>
   </div>
 </form>
