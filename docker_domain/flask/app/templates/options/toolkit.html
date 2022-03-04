@@ -1,4 +1,24 @@
 <p class="maxitext">Toolkit</p>
+
+{% if toolkit=="devicetoolkit"%}
+<div class="blackbox">
+  <p class="mediumtext">Control</p>
+  <div class="ddmenu">
+    <a
+      data-bs-toggle="collapse"
+      href="#values"
+      role="button"
+      aria-expanded="false"
+      onClick="rotateImage('valuesarrow');"
+    >
+      <ion-icon class="icon" id="valuesarrow" name="caret-forward-outline" />
+    </a>
+    <p class="menutext">Values</p>
+  </div>
+  <div class="collapse" id="values">{% include toolkit + '/values.html' %}</div>
+</div>
+{%endif%}
+
 <div class="blackbox">
   {% for title in titles %}
   <p class="mediumtext">{{title}}</p>

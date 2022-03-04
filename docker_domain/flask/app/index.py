@@ -1,8 +1,7 @@
-from flask import Flask, flash, render_template, request, redirect, url_for
+import json
+from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
-
 import os
-
 from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
@@ -18,14 +17,22 @@ app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
 deviceTypes = {
-    "Scan size": 0,
-    "Width": 0,
-    "Line rate": 0,
-    "Offset": {"x": 0, "y": 0},
-    "Set point": 0,
-    "Sample bias": 0,
-    "PID": {"KP": 0, "KI": 0, "KD": 0}
+    "scan_size": 0,
+    "img_pixel": 0,
+    "line_rate": 0,
+    "offset": {
+        "x": 0,
+        "y": 0
+    },
+    "set_point": 0,
+    "sample_bias": 0,
+    "PID": {
+        "KP": 0,
+        "KI": 0,
+        "KD": 0
+    }
 }
+
 
 imageTitles = {
     "Image processing": ["Interpolation", "Colorization", "Method"],
@@ -33,7 +40,6 @@ imageTitles = {
 
 deviceTitles = {
     "Video processing": ["Interpolation", "Colorization", "Method"],
-    "Control": ["Values"],
     "Format": ["Screenshot"]}
 
 
@@ -108,11 +114,41 @@ def watch_file(file):
 
 @ app.route("/device")
 def device_menu():
-    return render_template("deviceMenu.html",)
+    return render_template("/deviceMenu.html")
 
 
 @ app.route("/device/connect")
 def connect_link():
+    return redirect(url_for('watch_device'))
+
+
+@ app.route("/device/watch", methods=['GET', 'POST'])
+def watch_device():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'import' not in request.files:
+            flash('No file part')
+            print('No file part')
+            return redirect(request.url)
+        file = request.files['import']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            print('No selected file')
+            return redirect(request.url)
+        if file and (file.filename.endswith('.json') or file.filename.endswith('.JSON')):
+            imported = json.load(file)
+            session["import"] = json.dumps(imported)
+            return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
+        else:
+            flash('Wrong extension. Allowed extensions : .json, .JSON')
+            print('Wrong extension. Allowed extensions : .json, .JSON')
+            return redirect(request.url)
+
+    if not session.get("import") is None:
+        imported = json.loads(session.get("import"))
+        return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
     return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 

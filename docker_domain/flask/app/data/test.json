@@ -1,0 +1,16 @@
+{
+    "scan_size": 165,
+    "img_pixel": 264,
+    "line_rate": 0,
+    "offset": {
+        "x": 25,
+        "y": 25
+    },
+    "set_point": 255,
+    "sample_bias": 0,
+    "PID": {
+        "KP": 5,
+        "KI": 0,
+        "KD": 0
+    }
+}

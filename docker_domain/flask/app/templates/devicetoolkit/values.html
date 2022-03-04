@@ -1,4 +1,5 @@
-{% for type in types%} {%if types[type]%}
+{% if imported %} {% set types = imported%} {%endif%} {% for type in types%}
+{%if types[type] is mapping%}
 <p class="menutext">{{type}}</p>
 {% for subtype in types[type]%}
 <div class="rowdisp" style="align-items: center">
@@ -21,15 +22,31 @@
   />
 </div>
 {%endif%} {%endfor%}
-
 <div class="d-inline-flex align-items-center p-4" style="text-align: center">
   <div class="mx-2" style="margin-bottom: 5%">
     <button type="button" class="btn btn-primary">Set</button>
   </div>
+
   <div class="mx-2" style="margin-bottom: 5%">
-    <button type="button" class="btn btn-primary">Import</button>
+    <form method="post" enctype="multipart/form-data">
+      <label class="btn btn-primary" for="import-json">
+        <input
+          id="import-json"
+          type="file"
+          name="import"
+          onChange="this.form.submit()"
+          accept="application/JSON"
+          class="d-none"
+          single
+        />
+        Import
+      </label>
+    </form>
   </div>
+
   <div class="mx-2" style="margin-bottom: 5%">
-    <button type="button" class="btn btn-primary">Export</button>
+    <button type="button" class="btn btn-primary">
+      Export<input type="file" hidden />
+    </button>
   </div>
 </div>
