@@ -2,9 +2,12 @@ import json
 from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime
 from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
+from functions.com.listDevice import get_device_list
+import DAO.ConfigClassi
 
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
@@ -15,6 +18,9 @@ app.config['SECRET_KEY'] = 'ww55z6e98a+f32h547r8e7'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
+
+config=Config(logFilePath="logs/" +  datetime.now().strftime("%d:%m:%Y__%H:%M:%S"))
+
 
 deviceTypes = {
     "scan_size": 0,
@@ -119,7 +125,8 @@ def device_menu():
 
 @ app.route("/device/connect")
 def connect_link():
-    return redirect(url_for('watch_device'))
+    devDic = get_device_list(config)
+    return redirect(url_for('watch_device'), devDic)
 
 
 @ app.route("/device/watch", methods=['GET', 'POST'])
