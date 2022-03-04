@@ -1,0 +1,26 @@
+<p class="maxitext">Toolkit</p>
+<div class="blackbox">
+  {% for title in titles %}
+  <p class="mediumtext">{{title}}</p>
+  {% for subtitle in titles[title] %}
+  <div class="ddmenu">
+    <a
+      data-bs-toggle="collapse"
+      href="#{{''.join(subtitle.split()).lower()}}"
+      role="button"
+      aria-expanded="false"
+      onClick="rotateImage('{{''.join(subtitle.split()).lower()}}arrow');"
+    >
+      <ion-icon
+        class="icon"
+        id="{{''.join(subtitle.split()).lower()}}arrow"
+        name="caret-forward-outline"
+      />
+    </a>
+    <p class="menutext">{{subtitle}}</p>
+  </div>
+  <div class="collapse" id="{{''.join(subtitle.split()).lower()}}">
+    {% include toolkit + "/" + ''.join(subtitle.split()).lower()+ '.html' %}
+  </div>
+  {% endfor %} {% endfor %}
+</div>

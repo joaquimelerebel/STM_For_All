@@ -1,0 +1,11 @@
+{% extends "template.html" %} {% block content %}
+<div class="rowdisp">
+  <div class="lightgray container-fluid menu">
+    <div class="coldisp">{% block options %}{% endblock %}</div>
+  </div>
+  {% block mainpage %}{% endblock %}
+  <div class="lightgray container-fluid menu collapse" id="toolkit">
+    <div class="coldisp">{% block toolkit %}{% endblock %}</div>
+  </div>
+</div>
+{% endblock %}
