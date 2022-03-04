@@ -4,14 +4,13 @@ import time
 
 
 #print in stderr in red
-def eprint_RED(*args, **kwargs):
+def eprint_RED(filepath, *args, **kwargs):
+    log(filepath, args, kwargs) 
     sys.stderr.write(u"\u001b[31m")
     print(*args, file=sys.stderr, **kwargs)
     sys.stderr.write(u"\u001b[0m")
 
 #print in stderr in green
-
-
 def eprint_GREEN(*args, **kwargs):
     sys.stderr.write(u"\u001b[32m")
     print(*args, file=sys.stderr, **kwargs)
@@ -19,7 +18,8 @@ def eprint_GREEN(*args, **kwargs):
 
 
 #print in stdout in red
-def print_RED(*args, **kwargs):
+def print_RED(filepath, *args, **kwargs):
+    log(filepath, args, kwargs) 
     sys.stdout.write(u"\u001b[31m")
     print(*args, **kwargs)
     sys.stdout.write(u"\u001b[0m")
@@ -30,8 +30,9 @@ def print_GREEN(*args, **kwargs):
     print(*args, **kwargs)
     sys.stdout.write(u"\u001b[0m")
 
-#print in stdout in green
-def print_verbose_WHITE(isWithTs, *args, **kwargs):
+#print in stdout in white
+def print_verbose_WHITE(filepath, isWithTs, *args, **kwargs):
+    log(filepath, args, kwargs) 
     if(isWithTs) : 
         sys.stdout.write( f"[{time.time()}] " )
     print(*args, **kwargs)
