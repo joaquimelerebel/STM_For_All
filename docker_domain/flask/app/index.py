@@ -159,7 +159,7 @@ def save_config():
         if 'export' in request.form:
             return Response(jsonfile,
                             mimetype='application/json',
-                            headers={'Content-Disposition': 'attachment; filename=' + time.strftime('%Y%m%d_%H%M%S') + 'config.json'})
+                            headers={'Content-Disposition': 'attachment; filename=' + time.strftime('%Y%m%d_%H%M%S') + '_config.json'})
         elif 'set' in request.form:
             session["import"] = jsonfile
             flash("The config was successfully set", "success")
