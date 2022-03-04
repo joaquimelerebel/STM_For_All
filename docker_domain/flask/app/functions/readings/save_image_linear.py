@@ -13,8 +13,9 @@ def save_image(filename, data, output_folder):
     # if there is no output folder, create one
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-
+    name = filename[:-4] + '.jpg'
     # set the path and save the image in it
-    path = output_folder + filename[:-4] + '.jpg'
+    path = str(output_folder + name)
     img.save(path, 'JPEG')
-    return filename[:-4] + '.jpg'
+    img = Image.open(path)
+    return name, img.size, img.mode, img.format, img.palette

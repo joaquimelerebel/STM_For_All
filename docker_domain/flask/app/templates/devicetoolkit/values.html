@@ -1,0 +1,35 @@
+{% for type in types%} {%if types[type]%}
+<p class="menutext">{{type}}</p>
+{% for subtype in types[type]%}
+<div class="rowdisp" style="align-items: center">
+  <p class="minimenutext">{{subtype}}</p>
+  <input
+    type="number"
+    class="mx-2"
+    style="max-width: 20% !important"
+    value="{{types[type][subtype]}}"
+  />
+</div>
+{%endfor%} {%else %}
+<div class="rowdisp" style="align-items: center">
+  <p class="menutext">{{type}}</p>
+  <input
+    type="number"
+    class="mx-2"
+    style="max-width: 20% !important"
+    value="{{types[type]}}"
+  />
+</div>
+{%endif%} {%endfor%}
+
+<div class="d-inline-flex align-items-center p-4" style="text-align: center">
+  <div class="mx-2" style="margin-bottom: 5%">
+    <button type="button" class="btn btn-primary">Set</button>
+  </div>
+  <div class="mx-2" style="margin-bottom: 5%">
+    <button type="button" class="btn btn-primary">Import</button>
+  </div>
+  <div class="mx-2" style="margin-bottom: 5%">
+    <button type="button" class="btn btn-primary">Export</button>
+  </div>
+</div>

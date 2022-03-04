@@ -1,4 +1,4 @@
-{% extends "menuTemplate.html" %}{% block mainpage %}
+{% extends "./menuTemplate.html" %}{% block mainpage %}
 <div class="coldisp">
   <h2 class="title">Upload a file</h2>
   <div class="container" style="margin-top: 20px">
@@ -39,5 +39,5 @@
     </form>
   </div>
 </div>
-{% endblock %} {% block options %} {% include 'menuOptionsA.html' %} {% endblock
-%}
+{% endblock %} {% block options %} {% include './options/menuOptionsA.html' %}
+{% endblock %}
