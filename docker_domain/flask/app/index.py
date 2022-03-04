@@ -1,4 +1,5 @@
 import json
+from functions.save import to_JSON
 from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
 import os
@@ -143,6 +144,16 @@ def watch_device():
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
+    return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+
+
+@ app.route("/device/config/save", methods=['GET', 'POST'])
+def save_config():
+    if request.method == 'POST':
+        flash(request.form, "success")
+        if not session.get("import") is None:
+            imported = json.loads(session.get("import"))
+            return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
     return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 

@@ -9,7 +9,7 @@ class to_JSON:
             "line_rate": 0,
             "offset": {
                 "x": 0,
-                "y": 0,
+                "y": 0
             },
             "set_point": 0,
             "sample_bias": 0,

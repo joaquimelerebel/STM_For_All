@@ -31,7 +31,7 @@
 
       {% set breadcrumbs = url_for(request.endpoint, **request.view_args)[1:].split("/") %}
 
-      <nav class="navbar navbar-expand-lg sticky-top navbar-dark gray">
+      <nav class="navbar navbar-expand-lg navbar-dark gray">
         <div class="container-fluid">
           <a class="navbar-brand" href={{ url_for('main_menu') }}>
             <img class="img-fluid" src="{{ url_for('static',filename='img/logo_mst_white.png') }}" width= "125px" alt="MST LOGO" />
