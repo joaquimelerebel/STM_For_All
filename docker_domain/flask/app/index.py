@@ -1,4 +1,5 @@
 import json
+import time
 from functions.save import to_JSON as convertJSON
 from flask import Flask, Response, flash, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
@@ -158,7 +159,7 @@ def save_config():
         if 'export' in request.form:
             return Response(jsonfile,
                             mimetype='application/json',
-                            headers={'Content-Disposition': 'attachment; filename=blabla.json'})
+                            headers={'Content-Disposition': 'attachment; filename=' + time.strftime('%Y%m%d_%H%M%S') + 'config.json'})
         elif 'set' in request.form:
             session["import"] = jsonfile
             flash("The config was successfully set", "success")
