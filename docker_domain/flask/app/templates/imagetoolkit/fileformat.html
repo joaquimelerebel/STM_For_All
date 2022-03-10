@@ -1,1 +1,19 @@
-<div style="text-align: center">placeholder</div>
+<div style="text-align: center">
+  <form method="post" action="{{url_for('download_file', file=file)}}">
+    <select
+      id="formatdd"
+      name="formatdd"
+      required
+      class="form-select dark text-white form-control"
+      aria-label="Default select example"
+    >
+      <option selected disabled>Select format...</option>
+      <option value="0">JPEG</option>
+      <option value="1">PNG</option>
+      <option value="2">TIFF</option>
+    </select>
+    <button style="margin-top: 5%" type="submit" class="btn btn-primary">
+      Download
+    </button>
+  </form>
+</div>

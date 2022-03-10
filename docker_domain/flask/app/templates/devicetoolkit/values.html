@@ -1,52 +1,78 @@
-{% if imported %} {% set types = imported%} {%endif%} {% for type in types%}
-{%if types[type] is mapping%}
-<p class="menutext">{{type}}</p>
-{% for subtype in types[type]%}
-<div class="rowdisp" style="align-items: center">
-  <p class="minimenutext">{{subtype}}</p>
-  <input
-    type="number"
-    class="mx-2"
-    style="max-width: 20% !important"
-    value="{{types[type][subtype]}}"
-  />
-</div>
-{%endfor%} {%else %}
-<div class="rowdisp" style="align-items: center">
+<form method="post" action="{{url_for('save_config')}}">
+  {% if imported %} {% set types = imported%} {%endif%} {% for type in types%}
+  {%if types[type] is mapping%}
   <p class="menutext">{{type}}</p>
-  <input
-    type="number"
-    class="mx-2"
-    style="max-width: 20% !important"
-    value="{{types[type]}}"
-  />
-</div>
-{%endif%} {%endfor%}
-<div class="d-inline-flex align-items-center p-4" style="text-align: center">
-  <div class="mx-2" style="margin-bottom: 5%">
-    <button type="button" class="btn btn-primary">Set</button>
+  {% for subtype in types[type]%}
+  <div
+    class="rowdisp my-2"
+    style="
+      justify-content: space-between !important;
+      align-items: center !important;
+    "
+  >
+    <p class="minimenutext">{{subtype}}</p>
+    <input
+      type="number"
+      name="{{subtype}}"
+      class="form-control dark text-white"
+      style="max-width: 25% !important"
+      value="{{types[type][subtype]}}"
+      step="0.001"
+      required
+    />
   </div>
+  {%endfor%} {%else %}
+  <div
+    class="rowdisp my-2"
+    style="
+      justify-content: space-between !important;
+      align-items: center !important;
+    "
+  >
+    <p class="menutext">{{type}}</p>
+    <input
+      type="number"
+      name="{{type}}"
+      class="form-control dark text-white"
+      style="max-width: 25% !important"
+      value="{{types[type]}}"
+      step="0.001"
+      required
+    />
+  </div>
+  {%endif%} {%endfor%}
 
-  <div class="mx-2" style="margin-bottom: 5%">
-    <form method="post" enctype="multipart/form-data">
-      <label class="btn btn-primary" for="import-json">
-        <input
-          id="import-json"
-          type="file"
-          name="import"
-          onChange="this.form.submit()"
-          accept="application/JSON"
-          class="d-none"
-          single
-        />
-        Import
-      </label>
-    </form>
-  </div>
+  <div
+    class="d-inline-flex p-2 justify-content-center align-content-center"
+    style="width: 100%"
+  >
+    <div class="mx-2" style="margin-bottom: 5%">
+      <button type="submit" name="set" class="btn btn-primary">Set</button>
+    </div>
 
-  <div class="mx-2" style="margin-bottom: 5%">
-    <button type="button" class="btn btn-primary">
-      Export<input type="file" hidden />
-    </button>
+    <div class="mx-2" style="margin-bottom: 5%">
+      <button type="submit" name="export" class="btn btn-primary">
+        Export
+      </button>
+    </div>
   </div>
+</form>
+<div
+  class="d-inline-flex p-2 justify-content-center align-content-center"
+  style="width: 100%"
+>
+  <form method="post" enctype="multipart/form-data">
+    <label class="btn btn-primary" for="import-json">
+      <input
+        id="import-json"
+        type="file"
+        name="import"
+        onChange="this.form.submit()"
+        accept="application/JSON"
+        class="d-none"
+        single
+      />
+      Import
+    </label>
+  </form>
 </div>
