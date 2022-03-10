@@ -1,4 +1,5 @@
 import json
+from functions.save import to_JSON
 from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
 import os
@@ -68,15 +69,13 @@ def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
-            print('No file part')
+            flash('No file part', 'error')
             return redirect(request.url)
         file = request.files['file']
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
-            flash('No selected file')
-            print('No selected file')
+            flash('No selected file', 'error')
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -86,9 +85,7 @@ def upload_file():
             return redirect(url_for('watch_file', file=filename))
         else:
             flash('Wrong extension. Allowed extensions : ' +
-                  str(ALLOWED_EXTENSIONS).strip('[]'))
-            print('Wrong extension. Allowed extensions : ' +
-                  str(ALLOWED_EXTENSIONS).strip('[]'))
+                  str(ALLOWED_EXTENSIONS).strip('[]'), 'error')
             return redirect(request.url)
 
     return render_template("/functionnalities/uploadFile.html", format=app.config['ALLOWED_EXTENSIONS'])
@@ -134,28 +131,36 @@ def watch_device():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'import' not in request.files:
-            flash('No file part')
-            print('No file part')
+            flash('No file part', 'error')
             return redirect(request.url)
         file = request.files['import']
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
-            flash('No selected file')
-            print('No selected file')
+            flash('No selected file', 'error')
             return redirect(request.url)
         if file and (file.filename.endswith('.json') or file.filename.endswith('.JSON')):
             imported = json.load(file)
             session["import"] = json.dumps(imported)
+            flash("File successfully imported", "success")
             return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
         else:
-            flash('Wrong extension. Allowed extensions : .json, .JSON')
-            print('Wrong extension. Allowed extensions : .json, .JSON')
+            flash('Wrong extension. Allowed extensions : .json, .JSON', 'error')
             return redirect(request.url)
 
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
+    return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+
+
+@ app.route("/device/config/save", methods=['GET', 'POST'])
+def save_config():
+    if request.method == 'POST':
+        flash(request.form, "success")
+        if not session.get("import") is None:
+            imported = json.loads(session.get("import"))
+            return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
     return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
