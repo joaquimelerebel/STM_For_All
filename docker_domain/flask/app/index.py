@@ -8,6 +8,8 @@ from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
 from functions.com.listDevice import get_device_list
+from functions.com.interaction import ping
+import functions.com.cmd_int as cmd
 import DAO.ConfigClass as ConfigClass
 
 UPLOAD_FOLDER = './data/'
@@ -117,13 +119,35 @@ def watch_file(file):
 
 @ app.route("/device")
 def device_menu():
-    return render_template("/deviceMenu.html")
+    if not request.args.get('devices') is None :
+        device = request.args.get('devices');
+        selected = device;
+        cmd.print_verbose_WHITE(config.logFilePath, f"[REQ] ping {device}");
+        
+        #DEBUG--TODO
+        #status = ping( config, selected );
+        status = True;
+    else : 
+        selected="";
+        status=False;
+
+
+    if session.get("devices") is None:
+        devices = get_device_list(config)
+    else :
+        devices = session.get("devices") 
+    return render_template("/deviceMenu.html", devices=devices, selected=selected, status=status)
 
 
 @ app.route("/device/connect")
 def connect_link():
-    devDic = get_device_list(config)
-    return redirect(url_for('watch_device'), devDic)
+    if request.args.get('devices') is None :
+        return redirect(url_for('watch_device'))
+    else :
+        # pass information to the new page
+        dev = request.args.get('devices');
+        return redirect(url_for('watch_device'))
+
 
 
 @ app.route("/device/watch", methods=['GET', 'POST'])

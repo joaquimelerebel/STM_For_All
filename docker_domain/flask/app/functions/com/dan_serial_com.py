@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 import serial as serialLib
-import cmd_int as cmd
+import functions.com.cmd_int as cmd
 import numpy as np
 import time
 import struct

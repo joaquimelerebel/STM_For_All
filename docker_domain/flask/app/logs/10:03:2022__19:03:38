@@ -1,0 +1,1 @@
+[REQ] ping hwid2getting device listdevices found : [('USB1', 'desc1PID=123 this is the USB device 1', 'hwid1', ''), ('USB2', 'desc2PID=123 this is the USB device 2', 'hwid2', ''), ('USB3', 'desc3PID=123 this is the USB device 3', 'hwid3', ''), ('USB4', 'desc4PID=123 this is the USB device 4', 'hwid4', '')]

@@ -2,18 +2,93 @@
 <div class="coldisp">
   <h2 class="title">Device</h2>
   <p style="margin-left: 4%">
-    For now, not much can be done. The project is still a Work-In-Progress.
+    Select the device you want to work with : 
   </p>
+  {% if not devices %}
   <p style="text-align: center">
     Please plug the device to a usb port
   </p>
   <div class="greybox">No link detected</div>
-  <div style= 'text-align: center; margin-top: 1%;'>
-    <a href={{ url_for('connect_link') }}>
-        <button type="button" class="btn btn-primary">
-          Connect
-        </button>
-    </a>
+  {% else %}
+    <form action="/device" class="greybox rowdisp" style="flex: 0 1 auto; height:20%; justify-content: center;">
+      
+      {%if selected != "" %}
+      
+      <select id="select-dev" style='text-align: center; margin-top: 1%;' class="input-select"  id="devices" name="devices">
+      
+      {%else %}
+      
+      <select id="select-dev" style='text-align: center; margin-top: 1%;' class="input-select"  id="devices" name="devices">
+      
+      {%endif%}
+
+        {%for name, desc, hwid, port in devices%}
+          {%if selected == hwid%}
+            <option value="{{hwid}}" selected="selected">{{name}}  {{desc}}</option>
+          {%else%}
+            <option value="{{hwid}}">{{name}}  {{desc}}</option>
+          {%endif%}
+          
+          }
+        {%endfor%}
+      
+      </select>
+      
+      <input type="submit" class="btn btn-primary" value="STM Ping"/>
+      
+      {%if not selected == ""%}
+        <div class="status" style="margin: auto;"></div>
+      {%endif%}
+
+    </form>
+  {%endif%}
+
+  <div style='text-align: center; margin-top: 1%;'>
+      <button id="connect" type="button" class="btn btn-primary">
+        Connect
+      </button>
   </div>
 </div>
+{% endblock %}
+
+{% block body_script %}
+<script type="text/javascript">
+  {% if selected != "" %}
+    function checkStatusAndChange(){
+      if( $("#select-dev").find(':selected').val() == "{{selected}}" )
+      {
+        if({%if status%}{{"true"}}{%else%}{{"false"}}{%endif%})
+          $(".status").html("&#128994;");
+        else 
+          $(".status").html("&#128308;");
+      }
+      else
+      {
+          $(".status").html("");
+      }
+    }
+
+  function connect(){
+      {% if selected != "" %}
+        window.location.replace("device/connect?devices=" 
+          + $("#select-dev").find(':selected').val())
+      {% else %}
+        window.location.replace("{{ url_for('device_menu') }}");
+      {% endif %}
+
+    }
+
+    $(document).ready( function(){
+      $("#select-dev").on("click", function(){
+          checkStatusAndChange();
+      });
+      $("#connect").on("click", function(){
+          connect();
+      });
+    });
+    checkStatusAndChange();
+  {%endif%}
+
+
+</script>
 {% endblock %}

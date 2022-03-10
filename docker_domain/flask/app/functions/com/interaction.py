@@ -1,6 +1,6 @@
-from dan_serial_com import Serial_COM
-import cmd_int as cmd
-import timeout as tm
+from functions.com.dan_serial_com import Serial_COM
+import functions.com.cmd_int as cmd
+import functions.com.timeout as tm
 
 def ping( systemConfig, devicePath ):
     try :
