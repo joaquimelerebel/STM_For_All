@@ -103,34 +103,13 @@ def watch_file(file):
         path = url_for('static', filename='img/results/'+data[0])
         if fileformat == 1:
             # For PNG format
-            return send_file(
-                path,
-                as_attachment=True,
-                attachment_filename=time.strftime('%Y%m%d_%H%M%S') +
-                "_image.png",
-                mimetype='image/png'
-
-            )
+            return send_file(path, as_attachment=True, attachment_filename=time.strftime('%Y%m%d_%H%M%S') + "_image.png", mimetype='image/png')
         elif fileformat == 2:
             # For TIFF format
-            return send_file(
-                path,
-                as_attachment=True,
-                attachment_filename=time.strftime('%Y%m%d_%H%M%S') +
-                "_image.tiff",
-                mimetype='image/tiff'
-
-            )
+            return send_file(path, as_attachment=True, attachment_filename=time.strftime('%Y%m%d_%H%M%S') + "_image.tiff", mimetype='image/tiff')
         else:
             # for JPEG format
-            return send_file(
-                path,
-                as_attachment=True,
-                attachment_filename=time.strftime('%Y%m%d_%H%M%S') +
-                "_image.jpg",
-                mimetype='image/jpeg'
-
-            )
+            return send_file(path, as_attachment=True, attachment_filename=time.strftime('%Y%m%d_%H%M%S') + "_image.jpg", mimetype='image/jpeg')
 
     # To watch an image
     if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
