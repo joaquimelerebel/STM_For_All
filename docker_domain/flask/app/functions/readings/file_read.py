@@ -3,10 +3,10 @@ from numpy import asarray, zeros, float64, array
 
 from functions.readings.save_image_linear import save_image
 
-# Takes in the name of a file, a deals with the data by creating an image of the array and returns bath
+# Takes in the name of a file, and the input folder, and gives back the data array created from the reading (2D pixel array)
 
 
-def file_read(file, input_folder, output_folder, format=0):
+def file_read(file, input_folder):
     # try opening output_filename, if there is none, let's do it in stdout
     if(isinstance(file, str)):
         f = open(str(input_folder) + str(file), "r")
@@ -33,4 +33,4 @@ def file_read(file, input_folder, output_folder, format=0):
     if(isinstance(file, str)):
         f.close()
 
-    return save_image(file, data, output_folder, format)
+    return data

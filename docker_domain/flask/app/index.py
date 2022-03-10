@@ -1,12 +1,11 @@
 import json
 import time
+from functions.readings.save_image_linear import save_image
+from functions.readings.file_reading_switch import switch_file
 from functions.save import to_JSON as convertJSON
 from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file
 from werkzeug.utils import secure_filename
 import os
-from functions.readings.bin_read import binary_read
-from functions.readings.custom_read import custom_read
-from functions.readings.file_read import file_read
 
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
@@ -18,6 +17,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
+# Config file JSON for the STM
 deviceTypes = {
     "scan_size": 0,
     "img_pixel": 0,
@@ -35,10 +35,12 @@ deviceTypes = {
     }
 }
 
+# Title sections for the image toolkit
 imageTitles = {
     "Image processing": ["Interpolation", "Colorization", "Method"],
     "Format": ["File format", "Zoom"]}
 
+# Title sections for the device toolkit
 deviceTitles = {
     "Video processing": ["Interpolation", "Colorization", "Method"],
     "Format": ["Screenshot"]}
@@ -47,10 +49,14 @@ deviceTitles = {
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+# Main route
+
 
 @ app.route("/")
 def main_menu():
     return render_template("mainMenu.html",)
+
+# Image route
 
 
 @ app.route("/image")
@@ -87,21 +93,35 @@ def upload_file():
 
 @ app.route("/image/watch/<file>", methods=['GET', 'POST'])
 def watch_file(file):
+    # To watch an image
+    if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
+        return redirect(request.url)
+
+    data = switch_file(file, app.config['UPLOAD_FOLDER'])
+    path, size, mode, format, palette = save_image(
+        file, data, app.config['OUTPUT_FOLDER'])
+    path = url_for('static', filename='img/results/'+path)
+    return render_template("/functionnalities/watchImage.html", file=file,
+                           path=path,
+                           size=size,
+                           mode=mode,
+                           format=format,
+                           palette=palette,
+                           titles=imageTitles,
+                           toolkit="imagetoolkit")
+
+
+@ app.route("/image/download/<file>", methods=['GET', 'POST'])
+def download_file(file):
     # To save an image
     fileformat = 0
     if request.method == "POST" and request.form.get("formatdd"):
         fileformat = int(request.form.get("formatdd"))
-        if (file.endswith((".npy"))):
-            data = binary_read(
-                file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'], format=fileformat)
-        elif (file.endswith(('.mst'))):
-            data = file_read(
-                file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'], format=fileformat)
-        elif (file.endswith(('.bst'))):
-            data = custom_read(
-                file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'], format=fileformat)
+        data = switch_file(file, app.config['UPLOAD_FOLDER'])
 
-        path = url_for('static', filename='img/results/'+data[0])[1:]
+        response = save_image(
+            file, data, app.config['OUTPUT_FOLDER'], format=fileformat)
+        path = url_for('static', filename='img/results/'+response[0])[1:]
         if fileformat == 1:
             # For PNG format
             return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.png", mimetype='image/png')
@@ -111,30 +131,10 @@ def watch_file(file):
         else:
             # for JPEG format
             return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.jpg", mimetype='image/jpeg')
+    flash("Downloading was unsuccessful", "error")
+    return redirect(url_for('watch_file'))
 
-    # To watch an image
-    if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
-        return redirect(request.url)
-
-    if (file.endswith((".npy"))):
-        path, size, mode, format, palette = binary_read(
-            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-    elif (file.endswith(('.mst'))):
-        path, size, mode, format, palette = file_read(
-            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-    elif (file.endswith(('.bst'))):
-        path, size, mode, format, palette = custom_read(
-            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-
-    path = url_for('static', filename='img/results/'+path)
-    return render_template("/functionnalities/watchImage.html",
-                           path=path,
-                           size=size,
-                           mode=mode,
-                           format=format,
-                           palette=palette,
-                           titles=imageTitles,
-                           toolkit="imagetoolkit")
+# Device route
 
 
 @ app.route("/device")

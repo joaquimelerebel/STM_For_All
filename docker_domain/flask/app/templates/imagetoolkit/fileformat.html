@@ -1,5 +1,5 @@
 <div style="text-align: center">
-  <form method="post">
+  <form method="post" action="{{url_for('download_file', file=file)}}">
     <select
       id="formatdd"
       name="formatdd"
@@ -13,7 +13,7 @@
       <option value="2">TIFF</option>
     </select>
     <button style="margin-top: 5%" type="submit" class="btn btn-primary">
-      Generate
+      Download
     </button>
   </form>
 </div>
