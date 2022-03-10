@@ -1,7 +1,7 @@
 import json
 import time
 from functions.save import to_JSON as convertJSON
-from flask import Flask, Response, flash, render_template, request, redirect, session, url_for
+from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file
 from werkzeug.utils import secure_filename
 import os
 from functions.readings.bin_read import binary_read
@@ -13,7 +13,7 @@ ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
 OUTPUT_FOLDER = './static/img/results/'
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ww55z6e98a+f32h547r8e7'
+app.config['SECRET_KEY'] = os.urandom(12)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
@@ -87,6 +87,52 @@ def upload_file():
 
 @ app.route("/image/watch/<file>", methods=['GET', 'POST'])
 def watch_file(file):
+    # To save an image
+    fileformat = 0
+    if request.method == "POST" and request.form.get("formatdd"):
+        fileformat = int(request.form.get("formatdd"))
+        if (file.endswith((".npy"))):
+            data = binary_read(
+                file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'], format=fileformat)
+        elif (file.endswith(('.mst'))):
+            data = file_read(
+                file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'], format=fileformat)
+        elif (file.endswith(('.bst'))):
+            data = custom_read(
+                file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'], format=fileformat)
+        path = url_for('static', filename='img/results/'+data[0])
+        if fileformat == 1:
+            # For PNG format
+            return send_file(
+                path,
+                as_attachment=True,
+                attachment_filename=time.strftime('%Y%m%d_%H%M%S') +
+                "_image.png",
+                mimetype='image/png'
+
+            )
+        elif fileformat == 2:
+            # For TIFF format
+            return send_file(
+                path,
+                as_attachment=True,
+                attachment_filename=time.strftime('%Y%m%d_%H%M%S') +
+                "_image.tiff",
+                mimetype='image/tiff'
+
+            )
+        else:
+            # for JPEG format
+            return send_file(
+                path,
+                as_attachment=True,
+                attachment_filename=time.strftime('%Y%m%d_%H%M%S') +
+                "_image.jpg",
+                mimetype='image/jpeg'
+
+            )
+
+    # To watch an image
     if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
         return redirect(request.url)
 
@@ -99,6 +145,8 @@ def watch_file(file):
     elif (file.endswith(('.bst'))):
         path, size, mode, format, palette = custom_read(
             file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
+
+    path = url_for('static', filename='img/results/'+path)
     return render_template("/functionnalities/watchImage.html",
                            path=path,
                            size=size,

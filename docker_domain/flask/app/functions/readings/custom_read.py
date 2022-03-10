@@ -6,7 +6,7 @@ from numpy import zeros, float64, array
 from functions.readings.save_image_linear import save_image
 
 
-def custom_read(file, input_folder, output_folder):
+def custom_read(file, input_folder, output_folder, format=0):
     try:
         with open(str(input_folder) + str(file), "rb") as f:
             filecontent = f.read()
@@ -44,7 +44,7 @@ def custom_read(file, input_folder, output_folder):
 
         # creating our array to have our image
 
-        return save_image(file, data, output_folder)
+        return save_image(file, data, output_folder, format)
     except IOError as err:
         sys.stderr.write(f"file does not corresponds to the format : {err=}")
         flash('File does not corresponds to the format :', err)
