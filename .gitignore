@@ -143,3 +143,6 @@ output
 
 #vim files 
 *.swp
+
+#log files 
+log/
