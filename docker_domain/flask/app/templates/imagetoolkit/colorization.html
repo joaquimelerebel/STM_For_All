@@ -1,1 +1,76 @@
-<div style="text-align: center">placeholder</div>
+{%if colors|length == 0%} {% set colors=["#000000", "#888A85", "#ffffff"]%}
+{%endif%}
+<div style="text-align: center">
+  <form method="post" action="{{url_for('color_file', file=file)}}">
+    <div class="mx-2" style="margin-bottom: 5%">
+      <button
+        style="margin-top: 5%"
+        type="submit"
+        class="btn btn-primary"
+        name="L"
+      >
+        Reset to L
+      </button>
+    </div>
+
+    <div
+      class="rowdisp my-2"
+      style="
+        justify-content: space-between !important;
+        align-items: center !important;
+      "
+    >
+      <p class="menutext">Blacks:</p>
+      <input
+        type="color"
+        class="form-control form-control-color dark border-0 text-white"
+        value="{{colors[0]}}"
+        id="colorBlack"
+        name="colorBlack"
+      />
+    </div>
+    <div
+      class="rowdisp my-2"
+      style="
+        justify-content: space-between !important;
+        align-items: center !important;
+      "
+    >
+      <p class="menutext">Midpoint:</p>
+      <input
+        type="color"
+        class="form-control form-control-color dark border-0 text-white"
+        value="{{colors[1]}}"
+        id="colorMid"
+        name="colorMid"
+      />
+    </div>
+    <div
+      class="rowdisp my-2"
+      style="
+        justify-content: space-between !important;
+        align-items: center !important;
+      "
+    >
+      <p class="menutext">Whites:</p>
+      <input
+        type="color"
+        class="form-control form-control-color dark border-0 text-white"
+        value="{{colors[2]}}"
+        id="colorWhite"
+        name="colorWhite"
+      />
+    </div>
+
+    <div class="mx-2" style="margin-bottom: 5%">
+      <button
+        style="margin-top: 5%"
+        type="submit"
+        class="btn btn-primary"
+        name="apply"
+      >
+        Apply
+      </button>
+    </div>
+  </form>
+</div>

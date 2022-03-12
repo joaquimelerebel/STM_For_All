@@ -93,21 +93,30 @@ def upload_file():
 
 @ app.route("/image/watch/<file>", methods=['GET', 'POST'])
 def watch_file(file):
+    colors = []
     # To watch an image
     if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
         return redirect(request.url)
-
+    # Get the data corresponding to the format of the uploaded file
     data = switch_file(file, app.config['UPLOAD_FOLDER'])
-    path, size, mode, format, palette = save_image(
-        file, data, app.config['OUTPUT_FOLDER'])
-    path = url_for('static', filename='img/results/'+path)
+    # If the user preselected colors
+    if not session.get("colors") is None:
+        colors = session.get("colors")
+    # Get the path to the image (and some other info)
+    filename, size, mode, format, palette = save_image(
+        file, data, app.config['OUTPUT_FOLDER'], colors=colors)
+    path = url_for('static', filename='img/results/'+filename)
+
+    # Render the watchImage template
     return render_template("/functionnalities/watchImage.html", file=file,
                            path=path,
+                           filename=filename,
                            size=size,
                            mode=mode,
                            format=format,
                            palette=palette,
                            titles=imageTitles,
+                           colors=colors,
                            toolkit="imagetoolkit")
 
 
@@ -115,12 +124,16 @@ def watch_file(file):
 def download_file(file):
     # To save an image
     fileformat = 0
+    colors = []
     if request.method == "POST" and request.form.get("formatdd"):
         fileformat = int(request.form.get("formatdd"))
         data = switch_file(file, app.config['UPLOAD_FOLDER'])
 
+        # If the user preselected colors
+        if not session.get("colors") is None:
+            colors = session.get("colors")
         response = save_image(
-            file, data, app.config['OUTPUT_FOLDER'], format=fileformat)
+            file, data, app.config['OUTPUT_FOLDER'], format=fileformat, colors=colors)
         path = url_for('static', filename='img/results/'+response[0])[1:]
         if fileformat == 1:
             # For PNG format
@@ -132,8 +145,22 @@ def download_file(file):
             # for JPEG format
             return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.jpg", mimetype='image/jpeg')
     flash("Downloading was unsuccessful", "error")
-    return redirect(url_for('watch_file'))
+    return redirect(url_for('watch_file', file=file))
 
+
+@ app.route("/image/color/<file>", methods=['GET', 'POST'])
+def color_file(file):
+    # To color an image
+    if request.method == "POST":
+        if 'apply' in request.form:
+            if request.form.get("colorBlack") and request.form.get("colorMid") and request.form.get("colorWhite"):
+                colorRange = [request.form.get("colorBlack"), request.form.get(
+                    "colorMid"), request.form.get("colorWhite")]
+                session["colors"] = colorRange
+        else:
+            if not session.get("colors") is None:
+                session.pop("colors")
+    return redirect(url_for('watch_file', file=file))
 # Device route
 
 
