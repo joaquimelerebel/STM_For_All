@@ -1,26 +1,51 @@
-# CODE FROM  Julien Enselme : https://www.jujens.eu/posts/en/2018/Jun/02/python-timeout-function/
-# all credit for his work goes to him
+# code from Emil
+# https://stackoverflow.com/questions/492519/timeout-on-a-function-call
 
-import signal
-from contextlib import contextmanager
+import threading
+import trace
+import time
+import sys
 
+#class from https://www.geeksforgeeks.org/python-different-ways-to-kill-a-thread/
+class thread_with_trace(threading.Thread):
+  def __init__(self, *args, **keywords):
+    threading.Thread.__init__(self, *args, **keywords)
+    self.killed = False
+ 
+  def start(self):
+    self.__run_backup = self.run
+    self.run = self.__run     
+    threading.Thread.start(self)
+ 
+  def __run(self):
+    sys.settrace(self.globaltrace)
+    self.__run_backup()
+    self.run = self.__run_backup
+ 
+  def globaltrace(self, frame, event, arg):
+    if event == 'call':
+      return self.localtrace
+    else:
+      return None
+ 
+  def localtrace(self, frame, event, arg):
+    if self.killed:
+      if event == 'line':
+        raise SystemExit()
+    return self.localtrace
+ 
+  def kill(self):
+    self.killed = True
+ 
+def timeout(time, fn, args, err):
+    t = thread_with_trace(target=fn, args=args)
+    t.start()
 
-@contextmanager
-def timeout(time):
-    # Register a function to raise a TimeoutError on the signal.
-    signal.signal(signal.SIGALRM, raise_timeout)
-    # Schedule the signal to be sent after ``time``.
-    signal.alarm(time)
+    # Wait for time seconds or until process finishes
+    t.join(time)
 
-    try:
-        yield
-    except TimeoutError:
-        pass
-    finally:
-        # Unregister the signal so it won't be triggered
-        # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
+    # If thread is still active
+    if t.is_alive():
+        t.kill()
+        raise TimeoutError(err)
 
-
-def raise_timeout(signum, frame):
-    raise TimeoutError

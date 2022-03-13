@@ -3,7 +3,9 @@ from functions.save import to_JSON
 from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
 import os
+import pathlib
 from datetime import datetime
+# custom import
 from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
@@ -11,6 +13,7 @@ from functions.com.listDevice import get_device_list
 from functions.com.interaction import ping
 import functions.com.cmd_int as cmd
 import DAO.ConfigClass as ConfigClass
+
 
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
@@ -22,8 +25,16 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
-config=ConfigClass.Config(logFilePath="logs/" +  datetime.now().strftime("%d:%m:%Y__%H:%M:%S"))
-
+#check that the log folder exists
+try :
+    cpath=pathlib.Path(__file__).resolve()
+    if not os.path.exists(str(cpath) + "logs/") :
+        os.mkdir(str(cpath) + "logs")
+    # create the log file 
+    config=ConfigClass.Config(logFilePath= str(cpath) + "logs/" + datetime.now().strftime("%d:%m:%Y__%H:%M:%S"))
+except : 
+    print("Error during the config creation")
+    raise()
 
 deviceTypes = {
     "scan_size": 0,
@@ -125,8 +136,11 @@ def device_menu():
         cmd.print_verbose_WHITE(config.logFilePath, f"[REQ] ping {device}");
         
         #DEBUG--TODO
-        #status = ping( config, selected );
-        status = True;
+        try :
+            status = ping( config, selected );
+        except Exception as ex :
+            flash(ex)
+            status=False
     else : 
         selected="";
         status=False;

@@ -22,11 +22,11 @@
       
       {%endif%}
 
-        {%for name, desc, hwid, port in devices%}
-          {%if selected == hwid%}
-            <option value="{{hwid}}" selected="selected">{{name}}  {{desc}}</option>
+        {%for port, desc, hwid, name in devices%}
+          {%if selected == port%}
+            <option value="{{port}}" selected="selected">{{name}} -> {{desc}}</option>
           {%else%}
-            <option value="{{hwid}}">{{name}}  {{desc}}</option>
+            <option value="{{port}}">{{name}} -> {{hwid}}</option>
           {%endif%}
           
           }

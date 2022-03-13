@@ -2,19 +2,19 @@ from functions.com.dan_serial_com import Serial_COM
 import functions.com.cmd_int as cmd
 import functions.com.timeout as tm
 
+def ping_eff( systemConfig, devicePath ) :
+    com_ser = Serial_COM( systemConfig, devicePath ); 
+    com_ser.serial_init();
+    com_ser.serial_disable();
+
 def ping( systemConfig, devicePath ):
     try :
-        with tm.timeout( systemConfig.timeOutComTime ) :
-            import time
-            if devicePath != "":
-                com_ser = Serial_COM( systemConfig, devicePath );
-                
-                cmd.log( systemConfig.logFilePath, "[COM] PING")
-                com_ser.serial_init();
-                com_ser.serial_disable();
-
-            else :
-                raise(RuntimeError("device input name empty"))
+        cmd.log( systemConfig.logFilePath, "[COM] PING")
+        tm.timeout( systemConfig.timeOutComTime, ping_eff,
+                    (systemConfig, devicePath),
+                    "pong did not come in time")
+        if devicePath == "" :
+            raise RuntimeException("no path to the device")
     except OSError as ex:
         cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
         if systemConfig.debug :

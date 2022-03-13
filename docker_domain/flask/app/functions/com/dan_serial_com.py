@@ -17,17 +17,17 @@ class Serial_COM:
             raise RuntimeError(f"could not connect to : {devicePath}");
 
     def serial_init(self):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] SERIAL ENABLED")
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] SERIAL ENABLED")
         self.serial.write(b"SE")
         self.read_until_cmd();
 
     def serial_disable(self):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] SERIAL DISABLED")
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] SERIAL DISABLED")
         self.serial.write(b"SD")
 
     # Scan size in LSBs
     def scan_size(self, scan_size):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] SCAN-SIZE : " + str(scan_size))
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] SCAN-SIZE : " + str(scan_size))
         self.serial.write(b"SS" + scan_size)
 
     # Image pixels
@@ -38,20 +38,20 @@ class Serial_COM:
 
     # Line rate in Hz
     def line_rate(self, freq):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] FREQ : " + str(freq*100))
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] FREQ : " + str(freq*100))
         self.serial.write(b"LR" + str(freq*100))
 
     def x_offset(self, x_off):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] X-OFFSET : " + str(x_off))
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] X-OFFSET : " + str(x_off))
         self.serial.write(b"XO" + x_off)
 
     def y_offset(self, y_off):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] Y-OFFSET : " + str(y_off))
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] Y-OFFSET : " + str(y_off))
         self.serial.write(b"YO" + y_off)
 
     # Setpoint in LSBs
     def set_point(self, set_point):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] SET_POINT : " + str(set_point))
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] SET_POINT : " + str(set_point))
         self.serial.write(b"SP" + struct.pack(">", set_point))
 
     # Sample bias in LSBs
@@ -61,27 +61,27 @@ class Serial_COM:
         self.serial.write(b"SB" + struct.pack(">", sample_bias))
 
     def setKPGain(self, kp):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] KP : " + str(kp))
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] KP : " + str(kp))
         self.serial.write(b"KP" + kp)
 
     def setKIGain(self, ki):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] KI : " + str(ki))
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] KI : " + str(ki))
         self.serial.write(b"KI" + ki)
 
     def enable_scanning(self):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] ENABLE SCAN")
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] ENABLE SCAN")
         self.serial.write(b"EN")
 
     def disable_scanning(self):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] DISABLE SCAN")
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] DISABLE SCAN")
         self.serial.write(b"DL")
 
     def engage_tip(self):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] ENGAGE TIP")
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] ENGAGE TIP")
         self.serial.write(b"TE")
 
     def retract_tip(self):
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] RETRACT TIP")
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] RETRACT TIP")
         self.serial.write(b"TR")
 
     def read_until_cmd(self):
@@ -92,10 +92,10 @@ class Serial_COM:
             if stri in cmdlist:
                 break
             time.sleep(1)
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[in] " + str(stri))
+        cmd.print_verbose_WHITE(self.logFilePath, "[in] " + str(stri))
 
     def getPixelPerLine(self): 
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[out] ASK Pixel Per Line")
+        cmd.print_verbose_WHITE(self.logFilePath, "[out] ASK Pixel Per Line")
         self.serial.write(b"PE")
         rb = read_until_trigger(length=4, trigger=b"PE")
         return struct.unpack(">I", data[0:4])[0]
@@ -105,12 +105,12 @@ class Serial_COM:
         #read until we get b"DATA"
         while True:
             stri += self.serial.read(2)
-            cmd.print_verbose_WHITE(self.logFilePath, True, "[inDBG] " + str(stri) )
+            cmd.print_verbose_WHITE(self.logFilePath, f"[inDBG] {stri}" )
             if trigger in stri:
                 break
             time.sleep(0.01)
         
-        cmd.print_verbose_WHITE(self.logFilePath, True, "[in] --- reading DATA ----" )
+        cmd.print_verbose_WHITE(self.logFilePath, "[in] --- reading DATA ----" )
         #read the data
         stri = stri[stri.find(b"DATA\r\n") + len(b"DATA\r\n"):]
         stri += self.serial.read( length - len(stri) )
