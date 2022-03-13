@@ -35,7 +35,7 @@ try :
     config=ConfigClass.Config(logFilePath=logFilePath)
     cmd.print_verbose_WHITE(config.logFilePath, f"[STATUS] logFile Created at {logFilePath}")
 except : 
-    print("Error during the config creation")
+    flash("Error during the config creation")
     raise()
 
 deviceTypes = {
