@@ -27,11 +27,13 @@ app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
 #check that the log folder exists
 try :
-    cpath=pathlib.Path(__file__).resolve()
-    if not os.path.exists(str(cpath) + "logs/") :
-        os.mkdir(str(cpath) + "logs")
+    cpath=pathlib.Path(__file__).parent.resolve()
+    if not os.path.exists(str(cpath) + "/logs/") :
+        os.mkdir(str(cpath) + "/logs")
+    logFilePath=str(cpath) + "/logs/" + datetime.now().strftime("%d:%m:%Y__%H:%M:%S")
     # create the log file 
-    config=ConfigClass.Config(logFilePath= str(cpath) + "logs/" + datetime.now().strftime("%d:%m:%Y__%H:%M:%S"))
+    config=ConfigClass.Config(logFilePath=logFilePath)
+    cmd.print_verbose_WHITE(config.logFilePath, f"[STATUS] logFile Created at {logFilePath}")
 except : 
     print("Error during the config creation")
     raise()
