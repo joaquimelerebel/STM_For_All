@@ -6,7 +6,8 @@ from numpy import zeros, float64, array
 from functions.readings.save_image_linear import save_image
 
 
-def custom_read(file, input_folder, output_folder):
+# Takes in the name of a file, and the input folder, and gives back the data array created from the reading (2D pixel array)
+def custom_read(file, input_folder):
     try:
         with open(str(input_folder) + str(file), "rb") as f:
             filecontent = f.read()
@@ -44,7 +45,7 @@ def custom_read(file, input_folder, output_folder):
 
         # creating our array to have our image
 
-        return save_image(file, data, output_folder)
+        return data
     except IOError as err:
         sys.stderr.write(f"file does not corresponds to the format : {err=}")
         flash('File does not corresponds to the format :', err)

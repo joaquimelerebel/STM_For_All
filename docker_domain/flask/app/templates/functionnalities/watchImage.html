@@ -2,16 +2,14 @@
 
 <div class="coldisp">
   <h2 class="title">Image output</h2>
-  <span style="color: grey; margin-top: 0.5%; margin-left: 3%">
-    {{ url_for('static', filename='img/results/'+path) }}
-  </span>
+  <span style="color: grey; margin-top: 0.5%; margin-left: 3%"> {{path}} </span>
   <div class="container">
     <div style="margin-top: 2% !important; margin: auto; text-align: center">
       {% if path%}
       <div class="lightgray fit">
         <img
           class="img-fluid"
-          src="{{ url_for('static', filename='img/results/'+path) }}"
+          src="{{path}}"
           style="margintop: 2%"
           alt="Lacking image - Result of computation"
         />

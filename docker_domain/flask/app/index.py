@@ -1,17 +1,22 @@
 import json
-from functions.save import to_JSON
-from flask import Flask, flash, render_template, request, redirect, session, url_for
-from werkzeug.utils import secure_filename
-import os
+import time
 import pathlib
+import os
 from datetime import datetime
-# custom import
+from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file
+from werkzeug.utils import secure_filename
+
+#custom imports
+from functions.readings.save_image_linear import save_image
+from functions.readings.file_reading_switch import switch_file
+from functions.save import to_JSON as convertJSON
 from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
 from functions.com.listDevice import get_device_list
 from functions.com.interaction import ping
 import functions.com.cmd_int as cmd
+
 import DAO.ConfigClass as ConfigClass
 
 
@@ -20,7 +25,7 @@ ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
 OUTPUT_FOLDER = './static/img/results/'
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ww55z6e98a+f32h547r8e7'
+app.config['SECRET_KEY'] = os.urandom(12)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
@@ -37,7 +42,8 @@ try :
 except : 
     flash("Error during the config creation")
     raise()
-
+    
+# Config file JSON for the STM
 deviceTypes = {
     "scan_size": 0,
     "img_pixel": 0,
@@ -55,11 +61,12 @@ deviceTypes = {
     }
 }
 
-
+# Title sections for the image toolkit
 imageTitles = {
     "Image processing": ["Interpolation", "Colorization", "Method"],
     "Format": ["File format", "Zoom"]}
 
+# Title sections for the device toolkit
 deviceTitles = {
     "Video processing": ["Interpolation", "Colorization", "Method"],
     "Format": ["Screenshot"]}
@@ -68,10 +75,14 @@ deviceTitles = {
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+# Main route
+
 
 @ app.route("/")
 def main_menu():
     return render_template("mainMenu.html",)
+
+# Image route
 
 
 @ app.route("/image")
@@ -108,26 +119,75 @@ def upload_file():
 
 @ app.route("/image/watch/<file>", methods=['GET', 'POST'])
 def watch_file(file):
+    colors = []
+    # To watch an image
     if os.path.exists(str(app.config['UPLOAD_FOLDER']) + str(file)) == False:
         return redirect(request.url)
+    # Get the data corresponding to the format of the uploaded file
+    data = switch_file(file, app.config['UPLOAD_FOLDER'])
+    # If the user preselected colors
+    if not session.get("colors") is None:
+        colors = session.get("colors")
+    # Get the path to the image (and some other info)
+    filename, size, mode, format, palette = save_image(
+        file, data, app.config['OUTPUT_FOLDER'], colors=colors)
+    path = url_for('static', filename='img/results/'+filename)
 
-    if (file.endswith((".npy"))):
-        path, size, mode, format, palette = binary_read(
-            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-    elif (file.endswith(('.mst'))):
-        path, size, mode, format, palette = file_read(
-            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-    elif (file.endswith(('.bst'))):
-        path, size, mode, format, palette = custom_read(
-            file, app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER'])
-    return render_template("/functionnalities/watchImage.html",
+    # Render the watchImage template
+    return render_template("/functionnalities/watchImage.html", file=file,
                            path=path,
+                           filename=filename,
                            size=size,
                            mode=mode,
                            format=format,
                            palette=palette,
                            titles=imageTitles,
+                           colors=colors,
                            toolkit="imagetoolkit")
+
+
+@ app.route("/image/download/<file>", methods=['GET', 'POST'])
+def download_file(file):
+    # To save an image
+    fileformat = 0
+    colors = []
+    if request.method == "POST" and request.form.get("formatdd"):
+        fileformat = int(request.form.get("formatdd"))
+        data = switch_file(file, app.config['UPLOAD_FOLDER'])
+
+        # If the user preselected colors
+        if not session.get("colors") is None:
+            colors = session.get("colors")
+        response = save_image(
+            file, data, app.config['OUTPUT_FOLDER'], format=fileformat, colors=colors)
+        path = url_for('static', filename='img/results/'+response[0])[1:]
+        if fileformat == 1:
+            # For PNG format
+            return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.png", mimetype='image/png')
+        elif fileformat == 2:
+            # For TIFF format
+            return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.tiff", mimetype='image/tiff')
+        else:
+            # for JPEG format
+            return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.jpg", mimetype='image/jpeg')
+    flash("Downloading was unsuccessful", "error")
+    return redirect(url_for('watch_file', file=file))
+
+
+@ app.route("/image/color/<file>", methods=['GET', 'POST'])
+def color_file(file):
+    # To color an image
+    if request.method == "POST":
+        if 'apply' in request.form:
+            if request.form.get("colorBlack") and request.form.get("colorMid") and request.form.get("colorWhite"):
+                colorRange = [request.form.get("colorBlack"), request.form.get(
+                    "colorMid"), request.form.get("colorWhite")]
+                session["colors"] = colorRange
+        else:
+            if not session.get("colors") is None:
+                session.pop("colors")
+    return redirect(url_for('watch_file', file=file))
+# Device route
 
 
 @ app.route("/device")
@@ -187,7 +247,6 @@ def watch_device():
         else:
             flash('Wrong extension. Allowed extensions : .json, .JSON', 'error')
             return redirect(request.url)
-
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
@@ -197,11 +256,23 @@ def watch_device():
 @ app.route("/device/config/save", methods=['GET', 'POST'])
 def save_config():
     if request.method == 'POST':
-        flash(request.form, "success")
-        if not session.get("import") is None:
-            imported = json.loads(session.get("import"))
-            return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
-    return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+        req = request.form
+        convert = convertJSON.to_JSON()
+        convert.set_all(req.get('scan_size'), req.get('img_pixel'),
+                        req.get('line_rate'), req.get('x'), req.get('y'),
+                        req.get('set_point'), req.get('sample_bias'),
+                        req.get('KP'), req.get('KI'), req.get('KD'))
+        jsonfile = convert.json_output()
+        if 'export' in request.form:
+            return Response(jsonfile,
+                            mimetype='application/json',
+                            headers={'Content-Disposition': 'attachment; filename=' + time.strftime('%Y%m%d_%H%M%S') + '_config.json'})
+        elif 'set' in request.form:
+            session["import"] = jsonfile
+            flash("The config was successfully set", "success")
+            return redirect(url_for('watch_device'))
+    flash("The file wasn't exported", "error")
+    return redirect(url_for('watch_device'))
 
 
 if __name__ == "__main__":
