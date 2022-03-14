@@ -1,6 +1,10 @@
+import numpy as np
+import threading
+
 from functions.com.dan_serial_com import Serial_COM
 import functions.com.cmd_int as cmd
 import functions.com.timeout as tm
+
 
 def ping_eff( systemConfig, devicePath ) :
     com_ser = Serial_COM( systemConfig, devicePath ); 
@@ -28,7 +32,30 @@ def ping( systemConfig, devicePath ):
         if systemConfig.debug :
             raise ex;
 
-def scan( systemConfig, scan_config ):
+def read_scan( systemConfig, scan_config, matrix, com_ser, mustRead ):
+    try : 
+        increasing = True;
+        while(self.mustRead) :
+            # should go in timout thread
+            output = self.com_ser.read_until_trigger();
+            line, zAvg, eAvg = self.com_ser.format_DATA(s, config.width);
+            matrix[line,:] = zAvg[:];
+            increasing = not increasing;
+    
+    except OSError as ex:
+        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
+        if systemConfig.debug :
+            raise ex;
+    except TimeoutError as ex:
+        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
+        if systemConfig.debug :
+            raise ex;
+    except Exception as ex :
+        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] {ex}")
+        if systemConfig.debug :
+            raise ex;
+
+def scan(systemConfig, scan_config, matrix, com_ser):
     try :
         com_ser = Serial_COM( systemConfig, scan_config.devicePath );
          
@@ -72,13 +99,38 @@ def scan( systemConfig, scan_config ):
             raise ex;
 
 
-def simpleInteraction( config ):
-    com_ser = Serial_COM( config );
-    com_ser.serial_init();
-    com_ser.enable_scanning();
-    s = com_ser.read_until_trigger();
-    com_ser.disable_scanning();
-    com_ser.serial_disable();
-    line, zAvg, eAvg = com_ser.format_DATA(s, config.width)
-    for n in zAvg :
-        print(hex(n))
+
+
+class Scanner:
+    def __init__(self, systemConfig, scan_config) :
+        self.com_ser = Serial_COM( systemConfig, devicePath ); 
+        self.systemConfig = systemConfig;
+        self.scan_config = scan_config;
+        self.matrix = np.zeros((scan_config.width, scan_config.height), dtype=int);
+        self.thread = 0;
+        self.mustRead = True;
+
+    def getMatrix(self) :
+        return self.matrix.copy()
+
+    def start_scan(self):
+        args=(self.systemConfig, self.scan_config, self.matrix, self.com_ser, self.mustRead);
+        self.thread = Thread(target=launch_scan, args=args)
+        self.thread.start()
+        
+
+    def stop_scan(self):
+        #TODO
+        self.mustRead = False;
+        pass;
+
+    
+    def simpleInteraction(self, config ):
+        self.com_ser.serial_init();
+        self.com_ser.enable_scanning();
+        s = self.com_ser.read_until_trigger();
+        self.com_ser.disable_scanning();
+        self.com_ser.serial_disable();
+        line, zAvg, eAvg = self.com_ser.format_DATA(s, config.width)
+        for n in zAvg :
+            print(hex(n))

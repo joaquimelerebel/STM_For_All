@@ -3,7 +3,7 @@ import time
 import pathlib
 import os
 from datetime import datetime
-from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file
+from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file, jsonify
 from werkzeug.utils import secure_filename
 
 #custom imports
@@ -197,7 +197,6 @@ def device_menu():
         selected = device;
         cmd.print_verbose_WHITE(config.logFilePath, f"[REQ] ping {device}");
         
-        #DEBUG--TODO
         try :
             status = ping( config, selected );
         except Exception as ex :
@@ -217,18 +216,36 @@ def device_menu():
 
 @ app.route("/device/connect")
 def connect_link():
-    if request.args.get('devices') is None :
-        return redirect(url_for('watch_device'))
-    else :
-        # pass information to the new page
-        dev = request.args.get('devices');
-        return redirect(url_for('watch_device'))
+    if not request.args.get('devices') is None :
+        session["dev"] = request.args.get('devices');
+    return redirect(url_for('watch_device'))
 
+@ app.route("/device/launch_scan", methods=['POST'])
+def launch_scan():
+    cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to launch scan");
+    result={"isScanLaunched":True, "error":""} 
+    return jsonify(result)
+
+
+@ app.route("/device/updateImageScan", methods=['POST'])
+def updateImageDevice():
+    cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to update image");
+    #if not session["dev"] :
+    #    cmd.eprint_RED(config.logFilePath, f"[ERR SESSION] tried to update an image from no device");
+    #    return redirect(url_for('connect_link'))
+    #else :
+        # checks on the current status of the scan
+        # updatePicture(config, ... )
+        # if scan updated -> returns true 
+        # else returns false
+    result={"isReloadable":True, "Path":""} 
+    return jsonify(result)# true or false (need to reload the image or not)
 
 
 @ app.route("/device/watch", methods=['GET', 'POST'])
 def watch_device():
     if request.method == 'POST':
+
         # check if the post request has the file part
         if 'import' not in request.files:
             flash('No file part', 'error')
@@ -250,6 +267,15 @@ def watch_device():
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
+    
+    # added by ulysse, needs to be modified
+    if (not session.get("dev") is None) or (not request.args.get('device') is None) :
+        if not request.args.get('device') is None:
+            path=request.args.get('device')
+        if not session.get("dev") is None :
+            path=session.get("dev")
+        return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+    
     return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
