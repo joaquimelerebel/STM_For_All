@@ -2,6 +2,7 @@ import json
 import time
 import pathlib
 import os
+from types import SimpleNamespace
 from datetime import datetime
 from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file, jsonify
 from werkzeug.utils import secure_filename
@@ -14,7 +15,7 @@ from functions.readings.bin_read import binary_read
 from functions.readings.custom_read import custom_read
 from functions.readings.file_read import file_read
 from functions.com.listDevice import get_device_list
-from functions.com.interaction import ping
+import functions.com.interaction as scan
 import functions.com.cmd_int as cmd
 
 import DAO.ConfigClass as ConfigClass
@@ -192,13 +193,13 @@ def color_file(file):
 
 @ app.route("/device")
 def device_menu():
-    if not request.args.get('devices') is None :
+    if 'devices' in request.args :
         device = request.args.get('devices');
         selected = device;
         cmd.print_verbose_WHITE(config.logFilePath, f"[REQ] ping {device}");
         
         try :
-            status = ping( config, selected );
+            status = scan.ping( config, selected );
         except Exception as ex :
             flash(ex)
             status=False
@@ -207,7 +208,7 @@ def device_menu():
         status=False;
 
 
-    if session.get("devices") is None:
+    if not "devices" in session:
         devices = get_device_list(config)
     else :
         devices = session.get("devices") 
@@ -216,31 +217,56 @@ def device_menu():
 
 @ app.route("/device/connect")
 def connect_link():
-    if not request.args.get('devices') is None :
+    if not "devices" in session :
         session["dev"] = request.args.get('devices');
     return redirect(url_for('watch_device'))
 
 @ app.route("/device/launch_scan", methods=['POST'])
 def launch_scan():
     cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to launch scan");
-    result={"isScanLaunched":True, "error":""} 
-    return jsonify(result)
+    if not "dev" in session :
+        cmd.eprint_RED(config.logFilePath, f"[ERR] trying to start scan without device");
+        flash("device not available on session")
+        result={"isScanLaunched":False, "error":"No device on session"} 
+        return jsonify(result)
+
+    if not "import" in session :
+        cmd.eprint_RED(config.logFilePath, f"[ERR] no config available");
+        flash("set your config before you start the scan")
+        result={"isScanLaunched":False, "error":"No config available"} 
+        return jsonify(result)
+
+    path=session.get("dev")
+    # TODO change the scan config acording to the ways of kellian
+    # create the new scanner 
+    try :
+        config.devicePath = path
+        scanner = scan.Scanner(config, json.loads(session["import"], object_hook=lambda d: SimpleNamespace(**d)))
+        config.newScanner(scanner);
+        # launch the scan
+        scanner.start_scan();
+        result={"isScanLaunched":True, "error":""} 
+        return jsonify(result)
+    except Exception :
+        flash("did not get to start the scan")
+        cmd.eprint_RED(config.logFilePath, f"[ERR] while starting the scan");
+        raise
 
 
 @ app.route("/device/updateImageScan", methods=['POST'])
 def updateImageDevice():
     cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to update image");
-    #if not session["dev"] :
-    #    cmd.eprint_RED(config.logFilePath, f"[ERR SESSION] tried to update an image from no device");
-    #    return redirect(url_for('connect_link'))
-    #else :
+    if not config.scanner == None :
         # checks on the current status of the scan
-        # updatePicture(config, ... )
-        # if scan updated -> returns true 
-        # else returns false
-    result={"isReloadable":True, "Path":""} 
-    return jsonify(result)# true or false (need to reload the image or not)
+        if config.scanner.hasUpdated() :
+            matrix = config.scanner.getMatrix()
 
+            result={"isReloadable":True, "Path":""}
+        else : 
+            result={"isReloadable":False, "Path":""}     
+        
+        return jsonify(result)# true or false (need to reload the image or not)
+    return redirect(url_for("device_menu"))
 
 @ app.route("/device/watch", methods=['GET', 'POST'])
 def watch_device():
