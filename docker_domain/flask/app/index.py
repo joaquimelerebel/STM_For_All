@@ -247,9 +247,11 @@ def launch_scan():
         scanner.start_scan();
         result={"isScanLaunched":True, "error":""} 
         return jsonify(result)
-    except Exception :
+    except Exception as x:
         flash("did not get to start the scan")
         cmd.eprint_RED(config.logFilePath, f"[ERR] while starting the scan");
+        result={"isScanLaunched":False, "error":"error while starting the scan"} 
+        return jsonify(result)
         raise
 
 
@@ -272,6 +274,16 @@ def updateImageDevice():
 def watch_device():
     if request.method == 'POST':
 
+        # added by ulysse, needs to be modified
+        if (not session.get("dev") is None) or (not request.args.get('device') is None) :
+            if not request.args.get('device') is None:
+                path=request.args.get('device')
+            if not session.get("dev") is None :
+                path=session.get("dev")
+        else : 
+            path=None;
+
+
         # check if the post request has the file part
         if 'import' not in request.files:
             flash('No file part', 'error')
@@ -286,23 +298,15 @@ def watch_device():
             imported = json.load(file)
             session["import"] = json.dumps(imported)
             flash("File successfully imported", "success")
-            return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
+            return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
         else:
             flash('Wrong extension. Allowed extensions : .json, .JSON', 'error')
             return redirect(request.url)
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
-        return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
+        return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
     
-    # added by ulysse, needs to be modified
-    if (not session.get("dev") is None) or (not request.args.get('device') is None) :
-        if not request.args.get('device') is None:
-            path=request.args.get('device')
-        if not session.get("dev") is None :
-            path=session.get("dev")
-        return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
-    
-    return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+    return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
 @ app.route("/device/config/save", methods=['GET', 'POST'])
