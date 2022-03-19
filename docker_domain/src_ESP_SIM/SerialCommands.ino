@@ -79,6 +79,16 @@ void serialCommand(char* command)
         Serial.end();
         digitalWriteFast(SERIAL_LED, LOW);
       } 
+
+      else if( strncmp(command, "PE", 2) == 0 ) // get current pixel per line
+      {
+        boolean scanningEnabledOnCommand = scanningEnabled;
+        byte cache[4] = { (pixelsPerLine >> 24 ) && 0xFF, (pixelsPerLine >> 16) && 0xFF, (pixelsPerLine >> 8 ) && 0xFF, pixelsPerLine && 0xFF };
+        scanningEnabled = false; // Pause the scan
+        Serial.println("SE")
+        Serial.write( cache, 4 )
+        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scanning*/
+      } 
       
       
       else if(!strcmp(command, "SS")) // Scan size in LSBs

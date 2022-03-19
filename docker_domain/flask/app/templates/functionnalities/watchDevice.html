@@ -7,15 +7,17 @@
       {% if path%}
       <div class="lightgray fit">
         <img
+          id="dyn_img"
           class="img-fluid"
-          src="{{ url_for('static', filename='img/results/'+path) }}"
+          src="{{ url_for('static', filename='img/results/' + path) }}"
           style="margintop: 2%"
           alt="Lacking image - Result of computation"
         />
+        <button id="scan_launch" onclick="launch_scan()" class="btn btn-primary" type="button">launch scan</button>
       </div>
       {% else %}
       <h4>No flow</h4>
-
+      <button id="scan_launch" onclick="launch_scan()" class="btn btn-primary" type="button">launch scan</button>
       {% endif %}
     </div>
   </div>
@@ -23,3 +25,58 @@
 {% endblock %} {% block options %} {% include './options/menuOptionsInfo.html'
 %} {% endblock %} {% block toolkit %} {% include './options/toolkit.html' %} {%
 endblock %}
+
+{%block body_script%}
+<script type="text/javascript">
+  function launch_scan(){
+      var isScanLaunched=false;
+
+      //setup of the scan to send
+      // TODO (ask kellian if that's what he thought of)
+      config=[{
+        "Kp" : 0,
+        "Ki" : 0
+      }];
+
+      $.ajax({
+        type:"POST",
+        url:"launch_scan",
+        data: JSON.stringify(config),
+        contentType: "application/json",
+        dataType: 'json',
+        success: function(result){
+          isScanLaunched = result.isScanLaunched;
+          if( result.isScanLaunched )
+          {
+            console.log("scan launched");
+            $("#scan_launch").remove();
+
+            setInterval(function() {
+              $.ajax({
+                type:"POST",
+                url:"updateImageScan",
+                contentType: "application/json",
+                dataType: 'json',
+                success: function(result){
+                  console.log("reload");
+                  $("#dyn_img").attr('src',
+                  "{{ url_for('static', filename='img/results/') }}" + result.path + "?" + new Date().getTime() );
+                }
+              });
+            }, 8000);
+          }
+          else 
+          {
+            consol.log("scan not launched");
+            alert(result.error);
+          }
+
+        },
+        error: function(result){
+          consol.log("scan not launched");
+        }
+      });
+  };
+
+</script>
+{%endblock%}

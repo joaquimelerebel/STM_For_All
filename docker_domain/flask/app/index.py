@@ -1,11 +1,25 @@
 import json
 import time
+import pathlib
+import os
+from types import SimpleNamespace
+from datetime import datetime
+from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file, jsonify
+from werkzeug.utils import secure_filename
+
+# custom imports
 from functions.readings.save_image_linear import save_image
 from functions.readings.file_reading_switch import switch_file
 from functions.save import to_JSON as convertJSON
-from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file
-from werkzeug.utils import secure_filename
-import os
+from functions.readings.bin_read import binary_read
+from functions.readings.custom_read import custom_read
+from functions.readings.file_read import file_read
+from functions.com.listDevice import get_device_list
+import functions.com.interaction as scan
+import functions.com.cmd_int as cmd
+
+import DAO.ConfigClass as ConfigClass
+
 
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
@@ -16,6 +30,21 @@ app.config['SECRET_KEY'] = os.urandom(12)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
+
+# check that the log folder exists
+try:
+    cpath = pathlib.Path(__file__).parent.resolve()
+    if not os.path.exists(str(cpath) + "/logs/"):
+        os.mkdir(str(cpath) + "/logs")
+    logFilePath = str(cpath) + "/logs/" + \
+        datetime.now().strftime("%d:%m:%Y__%H:%M:%S")
+    # create the log file
+    config = ConfigClass.Config(logFilePath=logFilePath)
+    cmd.print_verbose_WHITE(
+        config.logFilePath, f"[STATUS] logFile Created at {logFilePath}")
+except:
+    flash("Error during the config creation")
+    raise()
 
 # Config file JSON for the STM
 deviceTypes = {
@@ -166,17 +195,90 @@ def color_file(file):
 
 @ app.route("/device")
 def device_menu():
-    return render_template("/deviceMenu.html")
+    if 'devices' in request.args:
+        device = request.args.get('devices')
+        selected = device
+        cmd.print_verbose_WHITE(config.logFilePath, f"[REQ] ping {device}")
+
+        try:
+            status = scan.ping(config, selected)
+        except Exception as ex:
+            flash(ex, "error")
+            status = False
+    else:
+        selected = ""
+        status = False
+
+    if not "devices" in session:
+        devices = get_device_list(config)
+    else:
+        devices = session.get("devices")
+    return render_template("/deviceMenu.html", devices=devices, selected=selected, status=status)
 
 
 @ app.route("/device/connect")
 def connect_link():
+    if not "devices" in session:
+        session["dev"] = request.args.get('devices')
     return redirect(url_for('watch_device'))
+
+
+@ app.route("/device/launch_scan", methods=['POST'])
+def launch_scan():
+    cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to launch scan")
+    if not "dev" in session:
+        cmd.eprint_RED(config.logFilePath,
+                       f"[ERR] trying to start scan without device")
+        flash("device not available on session", "error")
+        result = {"isScanLaunched": False, "error": "No device on session"}
+        return jsonify(result)
+
+    if not "import" in session:
+        cmd.eprint_RED(config.logFilePath, f"[ERR] no config available")
+        flash("set your config before you start the scan")
+        result = {"isScanLaunched": False, "error": "No config available"}
+        return jsonify(result)
+
+    path = session.get("dev")
+    # TODO change the scan config acording to the ways of kellian
+    # create the new scanner
+    try:
+        config.devicePath = path
+        scanner = scan.Scanner(config, json.loads(
+            session["import"], object_hook=lambda d: SimpleNamespace(**d)))
+        config.newScanner(scanner)
+        # launch the scan
+        scanner.start_scan()
+        result = {"isScanLaunched": True, "error": ""}
+        return jsonify(result)
+    except Exception:
+        flash("did not get to start the scan")
+        cmd.eprint_RED(config.logFilePath, f"[ERR] while starting the scan")
+        raise
+
+
+@ app.route("/device/updateImageScan", methods=['POST'])
+def updateImageDevice():
+    cmd.print_verbose_WHITE(
+        config.logFilePath, f"[LOG] trying to update image")
+    if not config.scanner == None:
+        # checks on the current status of the scan
+        if config.scanner.hasUpdated():
+            matrix = config.scanner.getMatrix()
+
+            result = {"isReloadable": True, "Path": ""}
+        else:
+            result = {"isReloadable": False, "Path": ""}
+
+        # true or false (need to reload the image or not)
+        return jsonify(result)
+    return redirect(url_for("device_menu"))
 
 
 @ app.route("/device/watch", methods=['GET', 'POST'])
 def watch_device():
     if request.method == 'POST':
+
         # check if the post request has the file part
         if 'import' not in request.files:
             flash('No file part', 'error')
@@ -198,6 +300,15 @@ def watch_device():
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
+
+    # added by ulysse, needs to be modified
+    if (not session.get("dev") is None) or (not request.args.get('device') is None):
+        if not request.args.get('device') is None:
+            path = request.args.get('device')
+        if not session.get("dev") is None:
+            path = session.get("dev")
+        return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+
     return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
