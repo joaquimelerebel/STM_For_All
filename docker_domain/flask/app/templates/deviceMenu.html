@@ -68,7 +68,7 @@
 
   function connect(){
       {% if selected != "" %}
-        window.location.replace("{{url_for(connect)}}?devices=" 
+        window.location.replace("{{url_for('connect_link')}}?devices=" 
           + $("#select-dev").find(':selected').val())
       {% else %}
         window.location.replace("{{ url_for('device_menu') }}");
