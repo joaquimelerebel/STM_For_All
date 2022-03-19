@@ -7,10 +7,10 @@ import time
 def eprint_RED(config, string, isWithTs=True):
     log(config, string);
     if(isWithTs) : 
-         string = f"[{time.time()}] " + string
+         string = f"[{time.asctime( time.localtime(time.time()) )}] " + string
 
     config.stdout_mutex.acquire()
-    sys.stderr.write(u"\u001b[31m" + string + u"\u001b[0m"+ f"\n")
+    sys.stderr.write(u"\u001b[31m" + string + u"\u001b[0m"+ "\n")
     config.stdout_mutex.release()
 
 #print in stderr in green
@@ -18,7 +18,7 @@ def eprint_GREEN(config, string, isWithTs=True):
     log(config, string);
 
     config.stdout_mutex.acquire()
-    sys.stderr.write(u"\u001b[32m" + string + u"\u001b[0m" + f"\n")
+    sys.stderr.write(u"\u001b[32m" + string + u"\u001b[0m" + "\n")
     config.stdout_mutex.release()
 
 
@@ -26,23 +26,23 @@ def eprint_GREEN(config, string, isWithTs=True):
 def print_RED(config, string, isWithTs=True):
     log(config, string) 
     if(isWithTs) : 
-         string = f"[{time.time()}] " + string
+         string = f"[{time.asctime( time.localtime(time.time()) )}] " + string
     
     config.stdout_mutex.acquire()
-    sys.stdout.write(u"\u001b[31m" + string + u"\u001b[0m"+ f"\n")
+    sys.stdout.write(u"\u001b[31m" + string + u"\u001b[0m"+ "\n")
     config.stdout_mutex.release()
 
 #print in stdout in green
 def print_GREEN(config, string):
     config.stdout_mutex.acquire()
-    sys.stdout.write(u"\u001b[32m" + string + u"\u001b[0m"+ f"\n")
+    sys.stdout.write(u"\u001b[32m" + string + u"\u001b[0m"+ "\n")
     config.stdout_mutex.release()
 
 #print in stdout in white
 def print_verbose_WHITE(config, string, isWithTs=True ):    
     log(config, string) 
     if(isWithTs) : 
-         string = f"[{time.time()}] " + string
+         string = f"[{time.asctime( time.localtime(time.time()) )}] " + string + "\n"
     
     config.stdout_mutex.acquire()
     sys.stdout.write(string)
@@ -50,7 +50,7 @@ def print_verbose_WHITE(config, string, isWithTs=True ):
 
 # print the logs in a file 
 def log(config, string): 
-    txt = f"[{time.time()}] {string}" + "\n";
+    txt = f"[{time.asctime( time.localtime(time.time()) )}] {string} \n";
     
     # use of the globally defined mutex
     config.logfile_mutex.acquire()

@@ -9,7 +9,7 @@
         <img
           id="dyn_img"
           class="img-fluid"
-          src="{{ url_for('static', filename='img/results/' + path) }}"
+          src="{{ url_for('static', filename='img/results' + path) }}"
           style="margintop: 2%"
           alt="Lacking image - Result of computation"
         />
@@ -59,8 +59,8 @@ endblock %}
                 dataType: 'json',
                 success: function(result){
                   console.log("reload");
-                  $("#dyn_img").attr('src',
-                  "{{ url_for('static', filename='img/results') }}" + result.path + "?" + new Date().getTime() );
+                  if ( result.isReloadable )
+                    $("#dyn_img").attr('src', "../" + result.Path );
                 }
               });
             }, 8000);

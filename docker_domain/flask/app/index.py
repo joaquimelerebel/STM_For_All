@@ -238,7 +238,7 @@ def launch_scan():
 
     if not "import" in session:
         cmd.eprint_RED(config, f"[ERR] no config available")
-        flash("set your config before you start the scan")
+        flash("set your config before you start the scan", "error")
         result = {"isScanLaunched": False, "error": "No config available"}
         return jsonify(result)
 
@@ -252,6 +252,7 @@ def launch_scan():
         config.newScanner(scanner)
         # launch the scan
         scanner.start_scan()
+        flash("Scan successfully launched", "success")
         result = {"isScanLaunched": True, "error": ""}
         return jsonify(result)
 
@@ -287,11 +288,11 @@ def update_image_device():
     if not session.get("colors") is None:
         colors = session.get("colors")
 
-    cmd.print_verbose_WHITE(
-        config.logFilePath, f"[LOG] trying to update image")
+    cmd.print_verbose_WHITE( config, f"[LOG] trying to update image")
     if not config.scanner == None:
         # checks on the current status of the scan
         if config.scanner.hasUpdated() or len(colors) > 0:
+            cmd.print_verbose_WHITE( config, f"[LOG] matrix updatable")
             matrix = config.scanner.getMatrix()
             # If the user preselected colors
             response = save_image(
