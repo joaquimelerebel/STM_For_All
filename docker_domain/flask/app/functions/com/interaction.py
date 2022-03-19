@@ -66,12 +66,12 @@ def scanSetup(systemConfig, scan_config, com_ser):
     try :
 
         # setup 
-        com_ser.img_pixel( int(scan_config.image_pixel) );
-        com_ser.line_rate( int(scan_confgi.line_rate) );
+        com_ser.img_pixel( int(scan_config.img_pixel) );
+        com_ser.line_rate( int(scan_config.line_rate) );
         com_ser.x_offset( int(scan_config.offset.x) );
         com_ser.y_offset( int(scan_config.offset.y) );
         com_ser.set_point( int(scan_config.set_point) );
-        com_ser.sample_bias( int(scan_confif.sample_bias) );
+        com_ser.sample_bias( int(scan_config.sample_bias) );
         com_ser.setKIGain( int(scan_config.PID.KI) );
         com_ser.setKPGain( int(scan_config.PID.KP) );
 

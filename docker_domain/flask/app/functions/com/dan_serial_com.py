@@ -28,45 +28,45 @@ class Serial_COM:
     # Scan size in LSBs
     def scan_size(self, scan_size):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] SCAN-SIZE : " + str(scan_size))
-        self.serial.write(b"SS" + scan_size)
+        self.serial.write(b"SS" + str(scan_size).encode("ascii"))
 
     # Image pixels
     def img_pixel(self, image_pix):
         cmd.print_verbose_WHITE(
             True, "[out] IMAGE-PIXEL : " + str(image_pix))
-        self.serial.write(b"IP" + image_pix)
+        self.serial.write(b"IP" + str(image_pix).encode("ascii"))
 
     # Line rate in Hz
     def line_rate(self, freq):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] FREQ : " + str(freq*100))
-        self.serial.write(b"LR" + str(freq*100))
+        self.serial.write(b"LR" + str(freq*100).encode("ascii"))
 
     def x_offset(self, x_off):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] X-OFFSET : " + str(x_off))
-        self.serial.write(b"XO" + x_off)
+        self.serial.write(b"XO" + str(x_off).encode("ascii"))
 
     def y_offset(self, y_off):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] Y-OFFSET : " + str(y_off))
-        self.serial.write(b"YO" + y_off)
+        self.serial.write(b"YO" + str(y_off).encode("ascii"))
 
     # Setpoint in LSBs
     def set_point(self, set_point):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] SET_POINT : " + str(set_point))
-        self.serial.write(b"SP" + struct.pack(">", set_point))
+        self.serial.write(b"SP" + str(set_point).encode("ascii"))
 
     # Sample bias in LSBs
     def sample_bias(self, sample_bias):
         cmd.print_verbose_WHITE(
             True, "[out] SAMPLE_BIAS : " + str(sample_bias))
-        self.serial.write(b"SB" + struct.pack(">", sample_bias))
+        self.serial.write(b"SB" + str(sample_bias).encode("ascii"))
 
     def setKPGain(self, kp):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] KP : " + str(kp))
-        self.serial.write(b"KP" + kp)
+        self.serial.write(b"KP" + str(kp).encode("ascii"))
 
     def setKIGain(self, ki):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] KI : " + str(ki))
-        self.serial.write(b"KI" + ki)
+        self.serial.write(b"KI" + str(ki).encode("ascii"))
 
     def enable_scanning(self):
         cmd.print_verbose_WHITE(self.logFilePath, "[out] ENABLE SCAN")
