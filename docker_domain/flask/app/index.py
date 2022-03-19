@@ -165,14 +165,14 @@ def download_file(file):
             file, data, app.config['OUTPUT_FOLDER'], format=fileformat, colors=colors)
         path = url_for('static', filename='img/results/'+response[0])[1:]
         if fileformat == 1:
-            # For PNG format
-            return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.png", mimetype='image/png')
+            # for JPEG format
+            return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.jpg", mimetype='image/jpeg')
         elif fileformat == 2:
             # For TIFF format
             return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.tiff", mimetype='image/tiff')
         else:
-            # for JPEG format
-            return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.jpg", mimetype='image/jpeg')
+            # For PNG format
+            return send_file(path, as_attachment=True, download_name=time.strftime('%Y%m%d_%H%M%S') + "_image.png", mimetype='image/png')
     flash("Downloading was unsuccessful", "error")
     return redirect(url_for('watch_file', file=file))
 
@@ -205,8 +205,8 @@ def device_menu():
         except Exception as ex:
             flash(ex, "error")
             status = False
-            if config.debug :
-                raise ex;
+            if config.debug:
+                raise ex
     else:
         selected = ""
         status = False
@@ -225,9 +225,9 @@ def connect_link():
     return redirect(url_for('watch_device'))
 
 
-@ app.route("/device/launch_scan", methods=['POST'])
+@ app.route("/device/image/scan/launch", methods=['POST'])
 def launch_scan():
-    #check if session exist
+    # check if session exist
     cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to launch scan")
     if not "dev" in session:
         cmd.eprint_RED(config.logFilePath,
@@ -243,7 +243,7 @@ def launch_scan():
         return jsonify(result)
 
     path = session.get("dev")
-    
+
     # create the new scanner
     try:
         config.devicePath = path
@@ -257,24 +257,49 @@ def launch_scan():
 
     except Exception as x:
         flash("did not get to start the scan", "error")
-        cmd.eprint_RED(config.logFilePath, f"[ERR] while starting the scan");
-        result={"isScanLaunched":False, "error":"error while starting the scan"} 
-        if config.debug :
+        cmd.eprint_RED(config.logFilePath, f"[ERR] while starting the scan")
+        result = {"isScanLaunched": False,
+                  "error": "error while starting the scan"}
+        if config.debug:
             raise
         return jsonify(result)
 
 
+@ app.route("/device/image/color", methods=['GET', 'POST'])
+def color_device():
+    # To color an image
+    if request.method == "POST":
+        if 'apply' in request.form:
+            if request.form.get("colorBlack") and request.form.get("colorMid") and request.form.get("colorWhite"):
+                colorRange = [request.form.get("colorBlack"), request.form.get(
+                    "colorMid"), request.form.get("colorWhite")]
+                session["colors"] = colorRange
+        else:
+            if not session.get("colors") is None:
+                session.pop("colors")
+    return redirect(url_for('update_image_device'))
 
-@ app.route("/device/updateImageScan", methods=['POST'])
-def updateImageDevice():
+
+@ app.route("/device/image/scan/update", methods=['POST', 'GET'])
+def update_image_device():
+
+    colors = []
+    if not session.get("colors") is None:
+        colors = session.get("colors")
+
     cmd.print_verbose_WHITE(
         config.logFilePath, f"[LOG] trying to update image")
     if not config.scanner == None:
         # checks on the current status of the scan
-        if config.scanner.hasUpdated():
+        if config.scanner.hasUpdated() or len(colors) > 0:
             matrix = config.scanner.getMatrix()
-            
-            result = {"isReloadable": True, "Path": ""}
+            # If the user preselected colors
+            response = save_image(
+                "scan_update_" + time.strftime('%Y%m%d_%H%M%S'), matrix, app.config['OUTPUT_FOLDER'], colors=colors)
+            path = url_for(
+                'static', filename='img/results/'+response[0])[1:]
+            # add image
+            result = {"isReloadable": True, "Path": path}
         else:
             result = {"isReloadable": False, "Path": ""}
 
@@ -286,14 +311,13 @@ def updateImageDevice():
 @ app.route("/device/watch", methods=['GET', 'POST'])
 def watch_device():
     # added by ulysse, needs to be modified
-    if (not session.get("dev") is None) or (not request.args.get('device') is None) :
+    if (not session.get("dev") is None) or (not request.args.get('device') is None):
         if not request.args.get('device') is None:
-            path=request.args.get('device')
-        if not session.get("dev") is None :
-            path=session.get("dev")
-    else : 
-        path=None;
-
+            path = request.args.get('device')
+        if not session.get("dev") is None:
+            path = session.get("dev")
+    else:
+        path = None
 
     if request.method == 'POST':
         # check if the post request has the file part
@@ -317,9 +341,8 @@ def watch_device():
     if not session.get("import") is None:
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
-    
-    return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
+    return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
 @ app.route("/device/config/save", methods=['GET', 'POST'])
