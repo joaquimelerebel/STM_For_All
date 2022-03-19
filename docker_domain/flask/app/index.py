@@ -205,6 +205,8 @@ def device_menu():
         except Exception as ex:
             flash(ex, "error")
             status = False
+            if config.debug :
+                raise ex;
     else:
         selected = ""
         status = False
@@ -225,6 +227,7 @@ def connect_link():
 
 @ app.route("/device/launch_scan", methods=['POST'])
 def launch_scan():
+    #check if session exist
     cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to launch scan")
     if not "dev" in session:
         cmd.eprint_RED(config.logFilePath,
@@ -240,7 +243,7 @@ def launch_scan():
         return jsonify(result)
 
     path = session.get("dev")
-    # TODO change the scan config acording to the ways of kellian
+    
     # create the new scanner
     try:
         config.devicePath = path
@@ -253,11 +256,13 @@ def launch_scan():
         return jsonify(result)
 
     except Exception as x:
-        flash("did not get to start the scan")
+        flash("did not get to start the scan", "error")
         cmd.eprint_RED(config.logFilePath, f"[ERR] while starting the scan");
         result={"isScanLaunched":False, "error":"error while starting the scan"} 
+        if config.debug :
+            raise
         return jsonify(result)
-        raise
+
 
 
 @ app.route("/device/updateImageScan", methods=['POST'])
@@ -268,7 +273,7 @@ def updateImageDevice():
         # checks on the current status of the scan
         if config.scanner.hasUpdated():
             matrix = config.scanner.getMatrix()
-
+            
             result = {"isReloadable": True, "Path": ""}
         else:
             result = {"isReloadable": False, "Path": ""}
@@ -280,18 +285,17 @@ def updateImageDevice():
 
 @ app.route("/device/watch", methods=['GET', 'POST'])
 def watch_device():
+    # added by ulysse, needs to be modified
+    if (not session.get("dev") is None) or (not request.args.get('device') is None) :
+        if not request.args.get('device') is None:
+            path=request.args.get('device')
+        if not session.get("dev") is None :
+            path=session.get("dev")
+    else : 
+        path=None;
+
+
     if request.method == 'POST':
-
-        # added by ulysse, needs to be modified
-        if (not session.get("dev") is None) or (not request.args.get('device') is None) :
-            if not request.args.get('device') is None:
-                path=request.args.get('device')
-            if not session.get("dev") is None :
-                path=session.get("dev")
-        else : 
-            path=None;
-
-
         # check if the post request has the file part
         if 'import' not in request.files:
             flash('No file part', 'error')
@@ -314,17 +318,7 @@ def watch_device():
         imported = json.loads(session.get("import"))
         return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
     
-    return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes, imported=imported)
-
-    # added by ulysse, needs to be modified
-    if (not session.get("dev") is None) or (not request.args.get('device') is None):
-        if not request.args.get('device') is None:
-            path = request.args.get('device')
-        if not session.get("dev") is None:
-            path = session.get("dev")
-        return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
-
-    return render_template("/functionnalities/watchDevice.html", titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
+    return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
 

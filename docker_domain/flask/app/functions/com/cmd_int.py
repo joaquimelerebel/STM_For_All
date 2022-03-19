@@ -32,7 +32,7 @@ def print_verbose_WHITE(filepath, string, isWithTs=True ):
     log(filepath, string) 
     if(isWithTs) : 
          string = f"[{time.time()}] " + string
-    print(string)
+    sys.stdout.write(string)
 
 # print the logs in a file 
 def log(filepath, string): 

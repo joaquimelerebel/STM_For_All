@@ -60,7 +60,7 @@ endblock %}
                 success: function(result){
                   console.log("reload");
                   $("#dyn_img").attr('src',
-                  "{{ url_for('static', filename='img/results/') }}" + result.path + "?" + new Date().getTime() );
+                  "{{ url_for('static', filename='img/results') }}" + result.path + "?" + new Date().getTime() );
                 }
               });
             }, 8000);
