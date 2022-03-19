@@ -40,7 +40,7 @@ endblock %}
 
       $.ajax({
         type:"POST",
-        url:"launch_scan",
+        url:"{{url_for('launch_scan')}}",
         data: JSON.stringify(config),
         contentType: "application/json",
         dataType: 'json',
@@ -54,7 +54,7 @@ endblock %}
             setInterval(function() {
               $.ajax({
                 type:"POST",
-                url:"updateImageScan",
+                url:"{{url_for('update_image_device')}}",
                 contentType: "application/json",
                 dataType: 'json',
                 success: function(result){

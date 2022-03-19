@@ -41,7 +41,7 @@ try:
     # create the log file
     config = ConfigClass.Config(logFilePath=logFilePath)
     cmd.print_verbose_WHITE(
-        config.logFilePath, f"[STATUS] logFile Created at {logFilePath}")
+        config, f"[STATUS] logFile Created at {logFilePath}")
 except:
     flash("Error during the config creation")
     raise()
@@ -198,7 +198,7 @@ def device_menu():
     if 'devices' in request.args:
         device = request.args.get('devices')
         selected = device
-        cmd.print_verbose_WHITE(config.logFilePath, f"[REQ] ping {device}")
+        cmd.print_verbose_WHITE(config, f"[REQ] ping {device}")
 
         try:
             status = scan.ping(config, selected)
@@ -228,16 +228,16 @@ def connect_link():
 @ app.route("/device/image/scan/launch", methods=['POST'])
 def launch_scan():
     # check if session exist
-    cmd.print_verbose_WHITE(config.logFilePath, f"[LOG] trying to launch scan")
+    cmd.print_verbose_WHITE(config, f"[LOG] trying to launch scan")
     if not "dev" in session:
-        cmd.eprint_RED(config.logFilePath,
+        cmd.eprint_RED(config,
                        f"[ERR] trying to start scan without device")
         flash("device not available on session", "error")
         result = {"isScanLaunched": False, "error": "No device on session"}
         return jsonify(result)
 
     if not "import" in session:
-        cmd.eprint_RED(config.logFilePath, f"[ERR] no config available")
+        cmd.eprint_RED(config, f"[ERR] no config available")
         flash("set your config before you start the scan")
         result = {"isScanLaunched": False, "error": "No config available"}
         return jsonify(result)
@@ -257,7 +257,7 @@ def launch_scan():
 
     except Exception as x:
         flash("did not get to start the scan", "error")
-        cmd.eprint_RED(config.logFilePath, f"[ERR] while starting the scan")
+        cmd.eprint_RED(config, f"[ERR] while starting the scan")
         result = {"isScanLaunched": False,
                   "error": "error while starting the scan"}
         if config.debug:

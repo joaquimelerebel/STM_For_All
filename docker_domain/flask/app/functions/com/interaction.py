@@ -13,7 +13,7 @@ def ping_eff( systemConfig, devicePath ) :
 
 def ping( systemConfig, devicePath ):
     try :
-        cmd.log( systemConfig.logFilePath, "[COM] PING")
+        cmd.log( systemConfig, "[COM] PING")
         if devicePath == "" :
             raise RuntimeException("no path to the device")
         tm.timeout( systemConfig.timeOutComTime, ping_eff,
@@ -22,15 +22,15 @@ def ping( systemConfig, devicePath ):
         return True
     
     except OSError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] (not right device) {ex}")
         if systemConfig.debug :
             raise ex;
     except TimeoutError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
         if systemConfig.debug :
             raise ex;
     except Exception as ex :
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] {ex}")
         if systemConfig.debug :
             raise ex;
 
@@ -50,15 +50,15 @@ def read_scan( systemConfig,
         com_ser.disable_scanning();
     
     except OSError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] (not right device) {ex}")
         if systemConfig.debug :
             raise ex;
     except TimeoutError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
         if systemConfig.debug :
             raise ex;
     except Exception as ex :
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] {ex}")
         if systemConfig.debug :
             raise ex;
 
@@ -76,15 +76,15 @@ def scanSetup(systemConfig, scan_config, com_ser):
         com_ser.setKPGain( int(scan_config.PID.KP) );
 
     except OSError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] (not right device) {ex}")
         if systemConfig.debug :
             raise ex;
     except TimeoutError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
         if systemConfig.debug :
             raise ex;
     except Exception as ex :
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] {ex}")
         if systemConfig.debug :
             raise ex;
 
@@ -132,7 +132,9 @@ class Scanner:
     def stop(self):
         #TODO
         self.mustRead = False;
-        self.reading_thread.join()
+        if reading_thread != 0 :
+            self.reading_thread.join()
+
         self.com_ser.disable_scanning();
         self.com_ser.retract_tip();
         self.com_ser.serial_disable();
