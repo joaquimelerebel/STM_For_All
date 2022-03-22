@@ -60,10 +60,10 @@ endblock %}
                 success: function(result){
                   console.log("reload");
                   if ( result.isReloadable )
-                    $("#dyn_img").attr('src', "../" + result.Path );
+                    $("#dyn_img").attr('src', "../" + result.Path + "?" + new Date().getTime());
                 }
               });
-            }, 8000);
+            }, 1000);
           }
           else 
           {

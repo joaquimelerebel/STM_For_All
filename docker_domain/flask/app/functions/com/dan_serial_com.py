@@ -101,15 +101,15 @@ class Serial_COM:
         rb = read_until_trigger(length=4, trigger=b"PE")
         return struct.unpack(">I", data[0:4])[0]
 
-    def read_until_trigger(self, length=16386, trigger=b"DATA"):
+    def read_until_trigger(self, length=16386, trigger=b"DATA\r\n"):
         stri = b""
         #read until we get b"DATA"
         while True:
-            stri += self.serial.read(2)
-            cmd.print_verbose_WHITE(self.config, f"[inDBG] {stri}" )
+            stri += self.serial.read(1)
+            #cmd.print_verbose_WHITE(self.config, f"[inDBG] {stri}" )
             if trigger in stri:
                 break
-            time.sleep(0.01)
+            time.sleep(0.001)
         
         cmd.print_verbose_WHITE(self.config, "[in] --- reading DATA ----" )
         #read the data
@@ -125,7 +125,7 @@ class Serial_COM:
        
         # everything is written in big endian
         # put the line counter at the start of the line
-        lineCounter = struct.unpack(">h", data[0:2])
+        lineCounter = struct.unpack(">H", data[0:2])[0];
         
         for index in range(0, pixelPerLine) :
             # reading from the byte 2, each number is 4 bytes long.

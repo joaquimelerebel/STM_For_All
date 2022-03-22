@@ -42,9 +42,10 @@ def read_scan( systemConfig,
     try : 
         increasing = True;
         while(mustRead) :
-            # should go in timout thread
+            cmd.eprint_RED(systemConfig, f"[DBG] new loop from read")
             output = com_ser.read_until_trigger();
             line, zAvg, eAvg = com_ser.format_LineDATA(output, int(scan_config.scan_size));
+            cmd.eprint_RED(systemConfig, f"[DBG] line nb : {line}");
             matrix[line,:] = zAvg[:];
             increasing = not increasing;
         com_ser.disable_scanning();
@@ -104,10 +105,10 @@ class Scanner:
         self.mustRead = True;
 
     def hasUpdated(self) :
-        return not np.array_equal(self.matrix, self.matrix_1)
+        return not (self.matrix == self.matrix_1).all()
 
     def getMatrix(self) :
-        self.matrix_1 = self.matrix;
+        self.matrix_1 = self.matrix.copy();
         return self.matrix_1.copy()
 
     def start_scan(self):
@@ -121,7 +122,7 @@ class Scanner:
                 self.matrix, 
                 self.com_ser, 
                 self.mustRead);
-
+        self.com_ser.enable_scanning();
         self.reading_thread = Thread(target=read_scan, args=args)
         self.reading_thread.start()
 
