@@ -68,7 +68,7 @@ void serialCommand(char* command)
         Serial.begin(115200);
         Serial.println("SE");
         serialEnabled = true;
-        digitalWriteFast(SERIAL_LED, HIGH);
+        
       }
       
       
@@ -77,18 +77,8 @@ void serialCommand(char* command)
         serialEnabled = false;
         Serial.flush();
         Serial.end();
-        digitalWriteFast(SERIAL_LED, LOW);
-      } 
-
-      else if( strncmp(command, "PE", 2) == 0 ) // get current pixel per line
-      {
-        boolean scanningEnabledOnCommand = scanningEnabled;
-        byte cache[4] = { (pixelsPerLine >> 24 ) && 0xFF, (pixelsPerLine >> 16) && 0xFF, (pixelsPerLine >> 8 ) && 0xFF, pixelsPerLine && 0xFF };
-        scanningEnabled = false; // Pause the scan
-        Serial.println("SE")
-        Serial.write( cache, 4 )
-        if(scanningEnabledOnCommand) scanningEnabled = true; // Resume scanning*/
-      } 
+        
+      }
       
       
       else if(!strcmp(command, "SS")) // Scan size in LSBs
@@ -179,13 +169,13 @@ void serialCommand(char* command)
       
       else if(!strcmp(command, "KP")) // P gain
       {
-        Kp = Serial.parseInt();          
+        //Kp = Serial.parseInt();          
       } 
       
       
       else if(!strcmp(command, "KI")) // I gain
       {
-        Ki = Serial.parseInt() * dt;        
+        //Ki = Serial.parseInt() * dt;        
       }
       
       

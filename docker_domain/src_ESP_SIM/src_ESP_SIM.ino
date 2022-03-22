@@ -116,15 +116,20 @@ void loop()
             
 						if(serialEnabled)
 						{
+                digitalWriteFast(SERIAL_LED, HIGH);
 								Serial.println("DATA");
 								Serial.write(data1, DATA_BUFFER_LENGTH);
 						}
 
 						// Uncomment this block to print human-readable data to the serial port:
-						/*
+/*
+              Serial.print("line counter ");
+              Serial.println(lineCounter);
+              Serial.print((int)((int)data2[0] << 8 | (int)data2[1]));
 						   for(unsigned int i = 0; i < pixelsPerLine * 2; i++) // Loop over pixels
 						   {
-  						   Serial.print((int)((int)data1[4*i+2] << 24 | (int)data1[4*i+3] << 16 |(int)data1[4*i+4] << 8 |(int)data1[4*i+5]));
+                 
+   						   Serial.print((int)((int)data1[4*i+2] << 24 | (int)data1[4*i+3] << 16 |(int)data1[4*i+4] << 8 |(int)data1[4*i+5]));
   						   Serial.print(" ");
 						   }
 						*/
@@ -136,12 +141,15 @@ void loop()
             
 						if(serialEnabled)
 						{
+                digitalWriteFast(SERIAL_LED, LOW);
 								Serial.println("DATA");
 								Serial.write(data2, DATA_BUFFER_LENGTH);
 						}
-
+/*
 						// Uncomment this block to print human-readable data to the serial port:
-						/*
+						   Serial.print("line counter ");
+              Serial.println(lineCounter);
+              Serial.print((int)((int)data2[0] << 8 | (int)data2[1]));
 						   for(unsigned int i = 0; i < pixelsPerLine * 2; i++) // Loop over pixels
 						   {
 						      Serial.print((int)((int)data2[4*i+2] << 24 | (int)data2[4*i+3] << 16 |(int)data2[4*i+4] << 8 |(int)data2[4*i+5]));
