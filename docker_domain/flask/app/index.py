@@ -203,10 +203,10 @@ def device_menu():
         try:
             status = scan.ping(config, selected)
         except Exception as ex:
-            flash(ex, "error")
+            flash("not the right device", "error")
             status = False
-            if config.debug:
-                raise ex
+            #if config.debug:
+            #    raise ex
     else:
         selected = ""
         status = False
