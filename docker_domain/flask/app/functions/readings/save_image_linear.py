@@ -19,11 +19,11 @@ def save_image(filename, data, output_folder, format=0, colors=[]):
         os.makedirs(output_folder)
     # selecting the format
     if format == 1:
-        # for PNG format
-        name = filename[:-4] + '.png'
+        # for JPEG format
+        name = filename[:-4] + '.jpg'
         # set the path and save the image in it
         path = str(output_folder + name)
-        img.save(path, 'PNG')
+        img.save(path, 'JPEG')
     elif format == 2:
         # for TIFF format
         name = filename[:-4] + '.tiff'
@@ -31,11 +31,11 @@ def save_image(filename, data, output_folder, format=0, colors=[]):
         path = str(output_folder + name)
         img.save(path, 'TIFF')
     else:
-        # for JPEG format
-        name = filename[:-4] + '.jpg'
+        # for PNG format
+        name = filename[:-4] + '.png'
         # set the path and save the image in it
         path = str(output_folder + name)
-        img.save(path, 'JPEG')
+        img.save(path, 'PNG')
 
     img = Image.open(path)
     return name, img.size, img.mode, img.format, img.palette

@@ -1,4 +1,4 @@
-{% extends "menuTemplate.html" %} {% block mainpage %}
+{% extends "mainMenu.html" %} {% block content %}
 <div class="coldisp">
   <h2 class="title">Device</h2>
   <p style="margin-left: 4%">
@@ -26,10 +26,8 @@
           {%if selected == port%}
             <option value="{{port}}" selected="selected">{{name}} -> {{desc}}</option>
           {%else%}
-            <option value="{{port}}">{{name}} -> {{hwid}}</option>
+            <option value="{{port}}">{{name}} -> {{desc}}</option>
           {%endif%}
-          
-          }
         {%endfor%}
       
       </select>
@@ -70,7 +68,7 @@
 
   function connect(){
       {% if selected != "" %}
-        window.location.replace("device/connect?devices=" 
+        window.location.replace("{{url_for('connect_link')}}?devices=" 
           + $("#select-dev").find(':selected').val())
       {% else %}
         window.location.replace("{{ url_for('device_menu') }}");

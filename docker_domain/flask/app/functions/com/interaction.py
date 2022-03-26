@@ -13,7 +13,7 @@ def ping_eff( systemConfig, devicePath ) :
 
 def ping( systemConfig, devicePath ):
     try :
-        cmd.log( systemConfig.logFilePath, "[COM] PING")
+        cmd.log( systemConfig, "[COM] PING")
         if devicePath == "" :
             raise RuntimeException("no path to the device")
         tm.timeout( systemConfig.timeOutComTime, ping_eff,
@@ -22,15 +22,15 @@ def ping( systemConfig, devicePath ):
         return True
     
     except OSError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] (not right device) {ex}")
         if systemConfig.debug :
             raise ex;
     except TimeoutError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
         if systemConfig.debug :
             raise ex;
     except Exception as ex :
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] {ex}")
         if systemConfig.debug :
             raise ex;
 
@@ -42,66 +42,50 @@ def read_scan( systemConfig,
     try : 
         increasing = True;
         while(mustRead) :
-            # should go in timout thread
+            cmd.eprint_RED(systemConfig, f"[DBG] new loop from read")
             output = com_ser.read_until_trigger();
             line, zAvg, eAvg = com_ser.format_LineDATA(output, int(scan_config.scan_size));
+            cmd.eprint_RED(systemConfig, f"[DBG] line nb : {line}");
             matrix[line,:] = zAvg[:];
             increasing = not increasing;
         com_ser.disable_scanning();
     
     except OSError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] (not right device) {ex}")
         if systemConfig.debug :
             raise ex;
     except TimeoutError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
         if systemConfig.debug :
             raise ex;
     except Exception as ex :
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] {ex}")
         if systemConfig.debug :
             raise ex;
 
-def scan(systemConfig, scan_config, matrix, com_ser):
+def scanSetup(systemConfig, scan_config, com_ser):
     try :
-        com_ser = Serial_COM( systemConfig, scan_config.devicePath );
-         
-        with tm.timeout( systemConfig.timeOutComTime ) :
-            import time
-            com_ser.serial_init();
-        
-        # setup 
-        com_ser.scan_size(scan_config.scan_size);
-        com_ser.img_pixel(scan_config.image_pix);
-        com_ser.line_rate(scan_confgi.freq);
-        
-        with tm.timeout( systemConfig.timeOutComTime ) :
-            import time
-            pixelPerLine = com_ser.getPixelPerLine();
-        #intitiation of scanning
-        com_ser.engage_tip();
-        com_ser.enable_scanning();
-        
-        #scanning
-        while(True) :
-            raw_data = com_ser.read_until_trigger(); 
-            lineCount, zAvg, eAvg = com_ser.format_LineDATA( raw_data, pixelPerLine );
-            if lineCount == scan_config.image_pix :
-                break;
 
-        com_ser.disable_scanning();
-        com_ser.serial_disable();
+        # setup 
+        com_ser.img_pixel( int(scan_config.img_pixel) );
+        com_ser.line_rate( int(scan_config.line_rate) );
+        com_ser.x_offset( int(scan_config.offset.x) );
+        com_ser.y_offset( int(scan_config.offset.y) );
+        com_ser.set_point( int(scan_config.set_point) );
+        com_ser.sample_bias( int(scan_config.sample_bias) );
+        com_ser.setKIGain( int(scan_config.PID.KI) );
+        com_ser.setKPGain( int(scan_config.PID.KP) );
 
     except OSError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] (not right device) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] (not right device) {ex}")
         if systemConfig.debug :
             raise ex;
     except TimeoutError as ex:
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] [TIMEOUT] (device didn't respond in time) {ex}")
         if systemConfig.debug :
             raise ex;
     except Exception as ex :
-        cmd.eprint_RED(systemConfig.logFilePath, f"[ERROR COM] {ex}")
+        cmd.eprint_RED(systemConfig, f"[ERROR COM] {ex}")
         if systemConfig.debug :
             raise ex;
 
@@ -121,22 +105,24 @@ class Scanner:
         self.mustRead = True;
 
     def hasUpdated(self) :
-        return not np.array_equal(self.matrix, self.matrix_1)
+        return not (self.matrix == self.matrix_1).all()
 
     def getMatrix(self) :
-        self.matrix_1 = self.matrix;
+        self.matrix_1 = self.matrix.copy();
         return self.matrix_1.copy()
 
     def start_scan(self):
-        #TODO seperate in other functions 
         self.com_ser.serial_init();
-        self.com_ser.enable_scanning();
-        # end of TODO
+
+        scanSetup(self.systemConfig, self.scan_config, self.com_ser);
+        self.com_ser.engage_tip();
+
         args=(  self.systemConfig, 
                 self.scan_config, 
                 self.matrix, 
                 self.com_ser, 
                 self.mustRead);
+        self.com_ser.enable_scanning();
         self.reading_thread = Thread(target=read_scan, args=args)
         self.reading_thread.start()
 
@@ -147,8 +133,11 @@ class Scanner:
     def stop(self):
         #TODO
         self.mustRead = False;
-        self.reading_thread.join()
+        if reading_thread != 0 :
+            self.reading_thread.join()
+
         self.com_ser.disable_scanning();
+        self.com_ser.retract_tip();
         self.com_ser.serial_disable();
 
     

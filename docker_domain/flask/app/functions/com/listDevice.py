@@ -4,7 +4,7 @@ import re
 import subprocess
 
 def get_device_list( systemConfig ) : 
-    cmd.print_RED( systemConfig.logFilePath, "getting device list")
+    cmd.print_RED( systemConfig, "getting device list")
     usbDic = get_usb_list();
     ports = serial.tools.list_ports.comports();
     #---DEBUG---
@@ -22,7 +22,7 @@ def get_device_list( systemConfig ) :
             name="";
         devices.append((port, desc, hwid, name));
         
-    cmd.print_verbose_WHITE( systemConfig.logFilePath, f"devices found : {devices}")
+    cmd.print_verbose_WHITE( systemConfig, f"devices found : {devices}")
     return devices;
             
 

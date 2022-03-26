@@ -1,3 +1,5 @@
+import threading
+
 class Config :
     def __init__(self, logFilePath="coucou.txt", TOcom=1, isDebug=True):
         self.logFilePath = logFilePath;
@@ -5,6 +7,10 @@ class Config :
         self.debug = isDebug
         self.scanner = 0;
         self.devicePath = 0;
+        # mutex creation 
+        self.logfile_mutex = threading.Lock()
+        self.stdout_mutex = threading.Lock()
+
 
     def newScanner(self, scanner):
         if not self.scanner == 0 :

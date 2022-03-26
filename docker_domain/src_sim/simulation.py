@@ -65,10 +65,10 @@ def sim_image(config: conf.Config):
                 data_voltage = (dataSet[h, w]*5)/255
 
             # applying borders
-            if data_voltage > 5:
-                data_voltage = 5
-            if data_voltage < 0:
-                data_voltage = 0
+            #if data_voltage > 5:
+             #   data_voltage = 5
+            #if data_voltage < 0:
+             #   data_voltage = 0
 
             data_voltages[h, w] = data_voltage
 
@@ -77,7 +77,6 @@ def sim_image(config: conf.Config):
                 tpoints[h, w] = fw.writePoint(h, w, data_voltage, True)
             else:
                 tpoints[h,w] = fw.writePoint(h, w, data_voltage, False)
-
 
     fw.writeAll(data_voltages)
 
@@ -90,7 +89,8 @@ def sim_image(config: conf.Config):
         stdevImage = float(std(dataflatten))
         statistics_set = {"Image": {
             "max": maxImage, "min": minImage, "mean": meanImage, "stdev": stdevImage}}
-        # creation of the image with error statistics
+        
+        # creation of the image stats with error statistics
         dataflatten = dataSet.flatten()
         maxWith_error = float(max(dataflatten))
         minWith_error = float(min(dataflatten))

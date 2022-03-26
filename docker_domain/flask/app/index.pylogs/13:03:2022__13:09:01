@@ -1,1 +1,0 @@
-[REQ] ping /dev/ttyUSB0[ERROR COM] signal only works in main thread of the main interpreter
