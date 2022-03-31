@@ -280,6 +280,36 @@ def color_device():
                 session.pop("colors")
     return redirect(url_for('update_image_device'))
 
+# same but in dynamic
+@ app.route("/device/image/color2", methods=['GET', 'POST'])
+def color_device2():
+    # To color an image
+    if request.method == "POST":
+        cmd.print_verbose_WHITE( config, f"[LOG] color change")
+        if 'apply' in request.form:
+            if request.form.get("colorBlack") and request.form.get("colorMid") and request.form.get("colorWhite"):
+                colorRange = [request.form.get("colorBlack"), request.form.get(
+                    "colorMid"), request.form.get("colorWhite")]
+                session["colors"] = colorRange
+        else:
+            if not session.get("colors") is None:
+                session.pop("colors")
+
+        if not type(config.scanner) == int : 
+            cmd.print_verbose_WHITE( config, f"[LOG] image update")
+            matrix = config.scanner.getMatrix()
+            result = {"isReloadable": False, "Path": ""}
+            response = save_image(
+                    "scan_update_" + time.strftime('%Y%m%d_%H%M%S'), matrix, app.config['OUTPUT_FOLDER'], colors=colors)
+            path = url_for(
+                    'static', filename='img/results/'+response[0])[1:]
+            isReloadable=True
+        else :
+            path = ""
+            isReloadable=False
+        result = {"isReloadable": isReloadable, "Path": path, "black" : colorRange[0], "mid": colorRange[1], "white":colorRange[2]}
+    return jsonify(result)
+
 
 @ app.route("/device/image/scan/update", methods=['POST', 'GET'])
 def update_image_device():

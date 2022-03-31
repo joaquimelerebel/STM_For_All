@@ -1,13 +1,13 @@
 {%if colors|length == 0%} {% set colors=["#000000", "#888A85", "#ffffff"]%}
 {%endif%}
 <div style="text-align: center">
-  <form method="post" action="{{url_for('color_device')}}">
+  <div >
     <div class="mx-2" style="margin-bottom: 5%">
       <button
         style="margin-top: 5%"
-        type="submit"
         class="btn btn-primary"
         name="L"
+        onClick="reset_color();"
       >
         Reset to L
       </button>
@@ -65,12 +65,60 @@
     <div class="mx-2" style="margin-bottom: 5%">
       <button
         style="margin-top: 5%"
-        type="submit"
         class="btn btn-primary"
         name="apply"
+        onClick="ajax_btn();"
       >
         Apply
       </button>
     </div>
-  </form>
+  </div>
 </div>
+
+<script type="text/javascript">
+  function ajax_btn()
+  {
+    black=$("#colorBlack").val();
+    mid=$("#colorMid").val();
+    white=$("#colorWhite").val();
+    $.ajax({
+              type:"POST",
+              url:"{{url_for('color_device2')}}",
+              data:{
+                apply: 1,
+                colorBlack : black,
+                colorMid : mid,
+                colorWhite : white
+              },
+
+              success: function(result){
+                reload_from_res(result);
+              }
+            });
+  }
+  function reset_color()
+  {
+    $.ajax({
+              type:"POST",
+              url:"{{url_for('color_device2')}}",
+              data:{
+                L:1
+              },
+
+              success: function(result){
+                reload_from_res(result);
+              }
+            });
+  }
+  function reload_from_res( data )
+  {
+    console.log("reload");
+    if ( data.isReloadable )
+    {
+      $("#dyn_img").attr('src', "../" + data.Path + "?" + new Date().getTime());
+      black=$("#colorBlack").val( data.black );
+      mid=$("#colorMid").val( data.mid );
+      white=$("#colorWhite").val( data.white );
+    }
+  }
+</script>
