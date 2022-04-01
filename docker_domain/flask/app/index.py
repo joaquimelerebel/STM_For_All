@@ -299,6 +299,9 @@ def color_device2():
             cmd.print_verbose_WHITE( config, f"[LOG] image update")
             matrix = config.scanner.getMatrix()
             result = {"isReloadable": False, "Path": ""}
+            colors = []
+            if not session.get("colors") is None:
+                colors = session.get("colors")
             response = save_image(
                     "scan_update_" + time.strftime('%Y%m%d_%H%M%S'), matrix, app.config['OUTPUT_FOLDER'], colors=colors)
             path = url_for(
@@ -307,7 +310,10 @@ def color_device2():
         else :
             path = ""
             isReloadable=False
-        result = {"isReloadable": isReloadable, "Path": path, "black" : colorRange[0], "mid": colorRange[1], "white":colorRange[2]}
+        if not session.get("colors") is None:
+            result = {"isReloadable": isReloadable, "Path": path, "black" : session["colors"][0], "mid": session["colors"][1], "white":session["colors"][2]}
+        else : 
+            result = {"isReloadable": isReloadable, "Path": path, "black" : "000000", "mid": "#808080", "white":"#FFFFFF"}
     return jsonify(result)
 
 
