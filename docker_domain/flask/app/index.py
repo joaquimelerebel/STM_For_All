@@ -382,6 +382,8 @@ def watch_device():
     return render_template("/functionnalities/watchDevice.html", path=path, titles=deviceTitles, toolkit="devicetoolkit", types=deviceTypes)
 
 
+
+
 @ app.route("/device/config/save", methods=['GET', 'POST'])
 def save_config():
     if request.method == 'POST':
@@ -402,6 +404,12 @@ def save_config():
             return redirect(url_for('watch_device'))
     flash("The file wasn't exported", "error")
     return redirect(url_for('watch_device'))
+
+@ app.route("/logs/get_logs", methods=['POST'])
+def get_logs():
+    if( cmd.hasUpdated() )
+        pass
+
 
 
 if __name__ == "__main__":
