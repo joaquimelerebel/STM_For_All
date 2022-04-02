@@ -1,0 +1,5 @@
+[STATUS] logFile Created at /home/ulysse/Documents/STM_project/CODE/STM_For_All/docker_domain/flask/app/logs/02:04:2022__16:10:30[REQ] ping /dev/ttyACM0[COM] PINGgetting device listdevices found : [][CLI] new client BjJQmNivEU_BChOdAAAB[REQ] ping /dev/ttyACM0[COM] PING[out] SERIAL ENABLED[in] b'SE'[out] SERIAL DISABLEDgetting device listdevices found : [('/dev/ttyACM0', 'USB Serial', 'USB VID:PID=16C0:0483 SER=8269050 LOCATION=5-2:1.0', 'Van Ooijen Technische Informatica Teensyduino Serial')][CLI] new client k_FgpgzONebc3NXiAAAD[CLI] new client Cyfvj2l5NlEM66aNAAAF[CLI] new client TTPZDOB8FtZlKZWbAAAH[LOG] trying to launch scan[out] SERIAL ENABLED[in] b'SE'[out] IMAGE-PIXEL : 0[out] FREQ : 0[out] X-OFFSET : 0[out] Y-OFFSET : 0[out] SET_POINT : 0[out] SAMPLE_BIAS : 0[out] KI : 0[out] KP : 0[out] ENGAGE TIP[out] ENABLE SCAN[DBG] new loop from read[in] --- reading DATA ----[DBG] line nb : 0[ERROR COM] Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request.  Consult the documentation on testing for
+information about how to avoid this problem.

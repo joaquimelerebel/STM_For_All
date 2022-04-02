@@ -38,7 +38,9 @@ def read_scan( systemConfig,
                 scan_config, 
                 matrix, 
                 com_ser, 
-                mustRead):
+                mustRead, 
+                owner,
+                consumer):
     try : 
         increasing = True;
         while(mustRead) :
@@ -47,6 +49,7 @@ def read_scan( systemConfig,
             line, zAvg, eAvg = com_ser.format_LineDATA(output, int(scan_config.scan_size));
             cmd.eprint_RED(systemConfig, f"[DBG] line nb : {line}");
             matrix[line,:] = zAvg[:];
+            consumer.consume(owner, systemConfig.devicePath);
             increasing = not increasing;
         com_ser.disable_scanning();
     
@@ -93,7 +96,7 @@ def scanSetup(systemConfig, scan_config, com_ser):
 
 
 class Scanner:
-    def __init__(self, systemConfig, scan_config) :
+    def __init__(self, systemConfig, scan_config, owner, consumer) :
         if systemConfig.devicePath == None :
             raise( RuntimeException("system config with no device path") )
         self.com_ser = Serial_COM( systemConfig, systemConfig.devicePath ); 
@@ -103,6 +106,8 @@ class Scanner:
         self.matrix_1 = 0;
         self.reading_thread = 0;
         self.mustRead = True;
+        self.owner = owner;
+        self.consumer = consumer;
 
     def hasUpdated(self) :
         return not (self.matrix == self.matrix_1).all()
@@ -121,7 +126,9 @@ class Scanner:
                 self.scan_config, 
                 self.matrix, 
                 self.com_ser, 
-                self.mustRead);
+                self.mustRead,
+                self.owner, 
+                self.consumer);
         self.com_ser.enable_scanning();
         self.reading_thread = Thread(target=read_scan, args=args)
         self.reading_thread.start()

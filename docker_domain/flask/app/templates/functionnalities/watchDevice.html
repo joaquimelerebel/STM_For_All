@@ -13,11 +13,11 @@
           style="margintop: 2%"
           alt="Lacking image - Result of computation"
         />
-        <button id="scan_launch" onclick="launch_scan()" class="btn btn-primary" type="button">launch scan</button>
+        <button id="scan_launch" class="btn btn-primary" type="button">launch scan</button>
       </div>
       {% else %}
       <h4>No flow</h4>
-      <button id="scan_launch" onclick="launch_scan()" class="btn btn-primary" type="button">launch scan</button>
+      <button id="scan_launch" class="btn btn-primary" type="button">launch scan</button>
       {% endif %}
     </div>
   </div>
@@ -28,55 +28,26 @@ endblock %}
 
 {%block body_script%}
 <script type="text/javascript">
-  function launch_scan(){
-      var isScanLaunched=false;
+  $(document).ready( function(){
+    var socket = io();
+    
+    socket.on("connection", socket => {
+      socket.join("{{path}}");
+    });
 
-      //setup of the scan to send
-      // TODO (ask kellian if that's what he thought of)
-      config=[{
-        "Kp" : 0,
-        "Ki" : 0
-      }];
+    socket.connect();
 
-      $.ajax({
-        type:"POST",
-        url:"{{url_for('launch_scan')}}",
-        data: JSON.stringify(config),
-        contentType: "application/json",
-        dataType: 'json',
-        success: function(result){
-          isScanLaunched = result.isScanLaunched;
-          if( result.isScanLaunched )
-          {
-            console.log("scan launched");
-            $("#scan_launch").remove();
 
-            setInterval(function() {
-              $.ajax({
-                type:"POST",
-                url:"{{url_for('update_image_device')}}",
-                contentType: "application/json",
-                dataType: 'json',
-                success: function(result){
-                  console.log("reload");
-                  if ( result.isReloadable )
-                    $("#dyn_img").attr('src', "../" + result.Path + "?" + new Date().getTime());
-                }
-              });
-            }, 1000);
-          }
-          else 
-          {
-            console.log("scan not launched");
-            alert(result.error);
-          }
 
-        },
-        error: function(result){
-          console.log("scan not launched");
-        }
-      });
-  };
+    socket.on("update_img", function( path ){
+      $("#dyn_img").attr('src', path + "?" + new Date().getTime());
+    });
+
+    $("#scan_launch").on("click", function () {
+          socket.emit("launch_scan");
+          $("#scan_launch").remove();
+    });
+  });
 
 </script>
 {%endblock%}

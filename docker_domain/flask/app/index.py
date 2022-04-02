@@ -5,6 +5,7 @@ import os
 from types import SimpleNamespace
 from datetime import datetime
 from flask import Flask, Response, flash, render_template, request, redirect, session, url_for, send_file, jsonify
+from flask_socketio import SocketIO, join_room
 from werkzeug.utils import secure_filename
 
 # custom imports
@@ -24,12 +25,16 @@ import DAO.ConfigClass as ConfigClass
 UPLOAD_FOLDER = './data/'
 ALLOWED_EXTENSIONS = ['bst', 'mst', 'npy']
 OUTPUT_FOLDER = './static/img/results/'
+PORT=8000
+SERVER_NAME = "127.0.0.1:{0}".format(PORT)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(12)
+app.config['SERVER_NAME'] = SERVER_NAME
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
+socketio = SocketIO(app)
 
 # check that the log folder exists
 try:
@@ -84,6 +89,21 @@ def allowed_file(filename):
 @ app.route("/")
 def main_menu():
     return render_template("mainMenu.html",)
+
+@socketio.on("connect")
+def connect():
+    if not request.sid in config.connected :
+        config.connected.append(request.sid);
+        cmd.print_verbose_WHITE(config, f"[CLI] new client {request.sid}");
+
+# join the different rooms
+@ socketio.on("join")
+def on_join( data ) : 
+    breakpoint()
+    room = data["room"]
+    if room in config.room : 
+        join_room(room)
+        cmd.print_verbose_RED(config, f"[CLI] new membre of {room} : {request.sid}");
 
 # Image route
 
@@ -190,6 +210,9 @@ def color_file(file):
             if not session.get("colors") is None:
                 session.pop("colors")
     return redirect(url_for('watch_file', file=file))
+
+
+
 # Device route
 
 
@@ -202,11 +225,16 @@ def device_menu():
 
         try:
             status = scan.ping(config, selected)
+            breakpoint()
+            if (not selected in config.room) and status :
+                config.room.append(selected);
+                cmd.print_verbose_WHITE(config, f"[LOG] room {selected} created")
+            if (selected in config.room) and not status :
+                config.room.remove(selected);
+                cmd.print_verbose_WHITE(config, f"[LOG] room {selected} remove")
         except Exception as ex:
             flash("not the right device", "error")
             status = False
-            #if config.debug:
-            #    raise ex
     else:
         selected = ""
         status = False
@@ -225,7 +253,7 @@ def connect_link():
     return redirect(url_for('watch_device'))
 
 
-@ app.route("/device/image/scan/launch", methods=['POST'])
+@ socketio.on("launch_scan")
 def launch_scan():
     # check if session exist
     cmd.print_verbose_WHITE(config, f"[LOG] trying to launch scan")
@@ -233,37 +261,34 @@ def launch_scan():
         cmd.eprint_RED(config,
                        f"[ERR] trying to start scan without device")
         flash("device not available on session", "error")
-        result = {"isScanLaunched": False, "error": "No device on session"}
-        return jsonify(result)
+        return
 
     if not "import" in session:
         cmd.eprint_RED(config, f"[ERR] no config available")
         flash("set your config before you start the scan", "error")
-        result = {"isScanLaunched": False, "error": "No config available"}
-        return jsonify(result)
+        return
 
     path = session.get("dev")
 
     # create the new scanner
     try:
+        consumer = Update_image_consumer()
         config.devicePath = path
         scanner = scan.Scanner(config, json.loads(
-            session["import"], object_hook=lambda d: SimpleNamespace(**d)))
+            session["import"], object_hook=lambda d: SimpleNamespace(**d)),
+            request.sid, consumer)
         config.newScanner(scanner)
         # launch the scan
         scanner.start_scan()
         flash("Scan successfully launched", "success")
-        result = {"isScanLaunched": True, "error": ""}
-        return jsonify(result)
 
     except Exception as x:
         flash("did not get to start the scan", "error")
         cmd.eprint_RED(config, f"[ERR] while starting the scan")
-        result = {"isScanLaunched": False,
-                  "error": "error while starting the scan"}
         if config.debug:
             raise
-        return jsonify(result)
+        return
+
 
 
 @ app.route("/device/image/color", methods=['GET', 'POST'])
@@ -316,16 +341,14 @@ def color_device2():
             result = {"isReloadable": isReloadable, "Path": path, "black" : "000000", "mid": "#808080", "white":"#FFFFFF"}
     return jsonify(result)
 
-
-@ app.route("/device/image/scan/update", methods=['POST', 'GET'])
-def update_image_device():
-
+# msg sent to the owner of the scan by the server
+def update_image_device( cli_id, room ) :
     colors = []
-    if not session.get("colors") is None:
-        colors = session.get("colors")
+    #if not session.get("colors") is None:
+     #   colors = session.get("colors")
 
     cmd.print_verbose_WHITE( config, f"[LOG] trying to update image")
-    if not config.scanner == None:
+    if not config.scanner == None :
         # checks on the current status of the scan
         if config.scanner.hasUpdated() or len(colors) > 0:
             cmd.print_verbose_WHITE( config, f"[LOG] matrix updatable")
@@ -333,16 +356,18 @@ def update_image_device():
             # If the user preselected colors
             response = save_image(
                 "scan_update_" + time.strftime('%Y%m%d_%H%M%S'), matrix, app.config['OUTPUT_FOLDER'], colors=colors)
-            path = url_for(
-                'static', filename='img/results/'+response[0])[1:]
-            # add image
-            result = {"isReloadable": True, "Path": path}
+            with app.app_context():
+                path = url_for(
+                'static', filename='img/results/' + response[0])
+            
+                # add image
+                socketio.emit('update_img', path, room=room)
         else:
-            result = {"isReloadable": False, "Path": ""}
+            socketio.emit('error', "error during the reload", room=room)        
 
-        # true or false (need to reload the image or not)
-        return jsonify(result)
-    return redirect(url_for("device_menu"))
+class Update_image_consumer :
+    def consume(this, cli_id, room):
+        update_image_device(cli_id, room);
 
 
 @ app.route("/device/watch", methods=['GET', 'POST'])
@@ -407,12 +432,11 @@ def save_config():
 
 @ app.route("/logs/get_logs", methods=['POST'])
 def get_logs():
-    if( cmd.hasUpdated() )
+    if( cmd.hasUpdated() ): 
         pass
 
 
 
 if __name__ == "__main__":
-    port = 5000
-    url = "http://127.0.0.1:{0}".format(port)
-    app.run(use_reloader=False, debug=True, port=port)
+    socketio.run(app, use_reloader=False, debug=True, port=PORT)
+    #app.run(use_reloader=False, debug=True, port=port)
