@@ -68,7 +68,7 @@ void serialCommand(char* command)
         Serial.begin(115200);
         Serial.println("SE");
         serialEnabled = true;
-        
+        digitalWriteFast(SERIAL_LED, HIGH);
       }
       
       
@@ -77,7 +77,7 @@ void serialCommand(char* command)
         serialEnabled = false;
         Serial.flush();
         Serial.end();
-        
+        digitalWriteFast(SERIAL_LED, LOW); 
       }
       
       

@@ -1,3 +1,4 @@
 numpy==1.21.2
 Pillow==9.0.0
 serial
+flask_socketio
