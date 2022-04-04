@@ -6,6 +6,8 @@ import trace
 import time
 import sys
 
+# must create a greenlet thread and use timeout functions on it
+
 #class from https://www.geeksforgeeks.org/python-different-ways-to-kill-a-thread/
 class thread_with_trace(threading.Thread):
   def __init__(self, *args, **keywords):

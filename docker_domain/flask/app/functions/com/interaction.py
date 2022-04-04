@@ -3,8 +3,8 @@ from threading import Thread
 
 from functions.com.dan_serial_com import Serial_COM
 import functions.com.cmd_int as cmd
-import functions.com.timeout as tm
-
+#import functions.com.timeout as tm
+import eventlet.greenthread as gt
 
 def ping_eff( systemConfig, devicePath ) :
     com_ser = Serial_COM( systemConfig, devicePath ); 
@@ -16,9 +16,9 @@ def ping( systemConfig, devicePath ):
         cmd.log( systemConfig, "[COM] PING")
         if devicePath == "" :
             raise RuntimeException("no path to the device")
-        tm.timeout( systemConfig.timeOutComTime, ping_eff,
-                    (systemConfig, devicePath),
-                    "pong did not come in time")
+        
+        gt.spawn( ping_eff, (systemConfig.timeOutComTime, systemConfig, devicePath, "pong did not come in time") )        
+        
         return True
     
     except OSError as ex:

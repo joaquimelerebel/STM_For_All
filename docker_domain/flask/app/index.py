@@ -430,12 +430,13 @@ def save_config():
     flash("The file wasn't exported", "error")
     return redirect(url_for('watch_device'))
 
+
+
+
 @ app.route("/logs/get_logs", methods=['POST'])
 def get_logs():
     if( cmd.hasUpdated() ): 
         pass
-
-
 
 if __name__ == "__main__":
     socketio.run(app, use_reloader=False, debug=True, port=PORT)
